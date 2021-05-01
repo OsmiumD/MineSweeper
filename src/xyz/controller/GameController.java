@@ -15,7 +15,6 @@ public class GameController implements GameListener {
         this.view1 = component;
         this.view2 = scoreBoard;
         this.model = board;
-
         view1.registerListener(this);
         initialGameState();
     }
@@ -40,9 +39,11 @@ public class GameController implements GameListener {
 
     @Override
     public void onPlayerLeftClick(BoardLocation location, SquareComponent component) {
-        //printMessage(location, "left");
-        view2.Goal(currentPlayer);
-        view2.repaint();
+        printMessage(location, "left");
+        Square clickedGrid=model.getGridAt(location);
+        clickedGrid.setOpened(true);
+        view1.setItemAt(location,clickedGrid.getNum());
+        view1.repaint();
         nextPlayer();
         // TODO: Implement the action after player click left Click
     }
@@ -50,8 +51,6 @@ public class GameController implements GameListener {
     @Override
     public void onPlayerRightClick(BoardLocation location, SquareComponent component) {
         //printMessage(location, "right");
-        view2.Lose(currentPlayer);
-        view2.repaint();
         nextPlayer();
         // TODO: Implement the action after player click right Click
     }

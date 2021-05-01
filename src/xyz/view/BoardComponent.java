@@ -21,7 +21,6 @@ public class BoardComponent extends JComponent {
         enableEvents(MouseEvent.MOUSE_EVENT_MASK);
         setLayout(null);
         setSize(rowLength, colLength);
-
         this.row = row;
         this.col = col;
         this.gridSize = colLength / col;
