@@ -40,14 +40,18 @@ public class GameController implements GameListener {
 
     @Override
     public void onPlayerLeftClick(BoardLocation location, SquareComponent component) {
-        printMessage(location, "left");
+        //printMessage(location, "left");
+        view2.Goal(currentPlayer);
+        view2.repaint();
         nextPlayer();
         // TODO: Implement the action after player click left Click
     }
 
     @Override
     public void onPlayerRightClick(BoardLocation location, SquareComponent component) {
-        printMessage(location, "right");
+        //printMessage(location, "right");
+        view2.Lose(currentPlayer);
+        view2.repaint();
         nextPlayer();
         // TODO: Implement the action after player click right Click
     }
