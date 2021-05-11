@@ -4,11 +4,13 @@ public class Board {
     private Square[][] grid;
     private int row;
     private int column;
+    private int mineNum;
 
-    public Board(int row, int col) {
+    public Board(int row, int col, int mineNum) {
         grid = new Square[row][col];
         this.column = col;
         this.row = row;
+        this.mineNum=mineNum;
 
         iniGrid();
         iniItem();
@@ -27,13 +29,16 @@ public class Board {
         grid[0][0].setNumberOfLandMine((byte) 3);
     }
 
+    /**
+     * 计算grid[i][j]附近雷的数量
+     * @return 雷的数量
+     */
     public byte calculateNum (int i, int j) {
-        // done: You may implement a method here to calculate the number of mine around a grid
         byte cnt = 0;
         for (int m = i-1; m <= i+1; m++) {
             for (int n = j-1; n <= j+1; n++) {
                 if (m >= 0 && n >= 0 && m < row && n < column) {
-                    if (grid[m][n].isFlag()) cnt++;
+                    if (grid[m][n].hasLandMine()) cnt++;
                 }
             }
         }
