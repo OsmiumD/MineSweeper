@@ -1,6 +1,6 @@
 package xyz.controller;
 
-import org.jetbrains.annotations.NotNull;
+//import org.jetbrains.annotations.NotNull;
 import xyz.listener.GameListener;
 import xyz.model.*;
 import xyz.view.*;
@@ -63,7 +63,7 @@ public class GameController implements GameListener {
         // TODO: Implement the action after player click middle Click
     }
 
-    private void printMessage (@NotNull BoardLocation location, String str) {
+    private void printMessage (BoardLocation location, String str) {
         int row_in_message = location.getRow();
         int column_in_message = location.getColumn();
         String format = "\nOn Player %d %s click at (%d, %d), ";

@@ -28,8 +28,16 @@ public class Board {
     }
 
     public byte calculateNum (int i, int j) {
-        // TODO: You may implement a method here to calculate the number of mine among a grid
-        return 0;
+        // done: You may implement a method here to calculate the number of mine around a grid
+        byte cnt = 0;
+        for (int m = i-1; m <= i+1; m++) {
+            for (int n = j-1; n <= j+1; n++) {
+                if (m >= 0 && n >= 0 && m < row && n < column) {
+                    if (grid[m][n].isFlag()) cnt++;
+                }
+            }
+        }
+        return cnt;
     }
 
     public Square getGridAt(BoardLocation location) {
