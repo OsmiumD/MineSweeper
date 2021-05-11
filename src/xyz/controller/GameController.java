@@ -43,7 +43,8 @@ public class GameController implements GameListener {
         Square clickedGrid=model.getGridAt(location);
         clickedGrid.setOpened(true);
         view1.setItemAt(location,clickedGrid.getNum());
-        view1.repaint();
+        view2.goal(currentPlayer);
+        repaintAll();
         nextPlayer();
         // TODO: Implement the action after player click left Click
     }
@@ -67,5 +68,10 @@ public class GameController implements GameListener {
         int column_in_message = location.getColumn();
         String format = "\nOn Player %d %s click at (%d, %d), ";
         System.out.printf(format, currentPlayer, str, row_in_message + 1, column_in_message + 1);
+    }
+
+    private void repaintAll(){
+        view1.repaint();
+        view2.repaint();
     }
 }

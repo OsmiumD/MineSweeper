@@ -4,7 +4,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.io.FileInputStream;
 
-public class ScoreBoard extends JFrame {
+public class ScoreBoard extends JComponent {
     private final int[][] scoreBoard;
     private static Font font;
 
@@ -19,12 +19,9 @@ public class ScoreBoard extends JFrame {
     }
 
     public ScoreBoard () {
-        setTitle("Score Board");
         setSize(400, 360);
-        setLocationRelativeTo(null);
-        setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         setLayout(null);
-        this.getContentPane().setBackground(Color.WHITE);
+        setBackground(Color.BLACK);
         this.setFont(font);
         scoreBoard = new int[2][2];
     }
@@ -43,11 +40,11 @@ public class ScoreBoard extends JFrame {
         g.drawString("" + scoreBoard[1][1], 300, 320);
     }
 
-    public void Goal (int player) {
+    public void goal (int player) {
         scoreBoard[0][player] ++;
     }
 
-    public void Lose (int player) {
+    public void lose (int player) {
         scoreBoard[1][player] ++;
     }
 }
