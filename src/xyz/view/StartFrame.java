@@ -22,6 +22,7 @@ public class StartFrame extends JFrame {
         easy.setLocation(90,50);
         easy.setVisible(false);
         add(easy);
+        System.out.println("Easy");
 
         offline.addActionListener(e->{
             offline.setVisible(false);
