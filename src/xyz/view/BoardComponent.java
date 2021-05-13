@@ -11,11 +11,11 @@ import java.util.*;
 import java.util.List;
 
 public class BoardComponent extends JComponent {
-    private List<GameListener> listenerList = new ArrayList<>();
-    private SquareComponent[][] gridComponents;
-    private int row;
-    private int col;
-    private int gridSize;
+    private final List<GameListener> listenerList = new ArrayList<>();
+    private final SquareComponent[][] gridComponents;
+    private final int row;
+    private final int col;
+    private final int gridSize;
 
     public BoardComponent (int row, int col, int rowLength, int colLength) {
         enableEvents(MouseEvent.MOUSE_EVENT_MASK);
