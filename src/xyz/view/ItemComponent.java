@@ -30,15 +30,6 @@ public class ItemComponent extends JComponent {
     }
 
     private void painting (Graphics g) {
-        int spacing = (int) (getWidth() * 0.05);
-        Image image = ItemUtil.genItem(num);
 
-        if (image != null) {
-            g.drawImage(image, spacing, spacing, getWidth() - 2 * spacing, getHeight() - 2 * spacing, this);
-        } else {
-            if (num == 0) return;
-            g.setFont(font);
-            g.drawString("" + num, 18, 55);
-        }
     }
 }

@@ -53,12 +53,7 @@ public class BoardComponent extends JComponent {
     }
 
     public void setItemAt (BoardLocation location, int num) {
-        removeItemAt(location);
-        getGridAt(location).add(new ItemComponent(num));
-    }
-
-    private void flagGrid (BoardLocation location) {
-
+        getGridAt(location).setItem(num);
     }
 
     // 通过鼠标事件更改：界面 （其他在GameController中改）

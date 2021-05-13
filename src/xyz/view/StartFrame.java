@@ -7,8 +7,6 @@ import javax.swing.*;
 import java.util.ArrayList;
 
 public class StartFrame extends JFrame {
-    private final int MAX_BOARD_WIDTH=800;
-    private final int MAX_BOARD_HEIGHT=500;
 
     public StartFrame() {
         setTitle("Select");
@@ -22,15 +20,16 @@ public class StartFrame extends JFrame {
         offline.setLocation(90, 50);
         add(offline);
 
-        JButton customize=new JButton("customize");
+        JButton customize=new JButton("自定义大小");//目前大小就自己输进去，只是为了测试能不能自动改BoardComponent大小
         customize.setSize(120,20);
-        customize.setLocation(100,150);
-        customize.addActionListener(e->initGame(40,1,10));
+        customize.setLocation(60,150);
+        customize.addActionListener(e->initGame(5,36,10));
         add(customize);
         ArrayList<JButton> difButtons = initDifButton();
 
         offline.addActionListener(e -> {
             offline.setVisible(false);
+            customize.setVisible(false);
             for (JButton button : difButtons) {
                 button.setVisible(true);
             }
@@ -38,13 +37,15 @@ public class StartFrame extends JFrame {
     }
 
     private BoardComponent initBoardComponent(int row, int col) {
+        int MAX_BOARD_WIDTH = 1000;
+        int MAX_BOARD_HEIGHT = 600;
         double ratioBoard=((double) MAX_BOARD_WIDTH)/((double) MAX_BOARD_HEIGHT);
         int width, height;
         if(col*ratioBoard>row){
-            height=MAX_BOARD_HEIGHT;
+            height= MAX_BOARD_HEIGHT;
             width=height/col*row;
         }else{
-            width=MAX_BOARD_WIDTH;
+            width= MAX_BOARD_WIDTH;
             height=width/row*col;
         }
         return new BoardComponent(row, col, width, height);
