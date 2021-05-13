@@ -40,9 +40,9 @@ public class GameController implements GameListener {
     @Override
     public void onPlayerLeftClick(BoardLocation location, SquareComponent component) {
         printMessage(location, "left");
-        Square clickedGrid=model.getGridAt(location);
+        Square clickedGrid = model.getGridAt(location);
         clickedGrid.setOpened(true);
-        view1.setItemAt(location,clickedGrid.getNum());
+        view1.setItemAt(location, clickedGrid.getNum());
         view2.goal(currentPlayer);
         repaintAll();
         nextPlayer();
@@ -73,5 +73,39 @@ public class GameController implements GameListener {
     private void repaintAll(){
         view1.repaint();
         view2.repaint();
+    }
+
+    /**
+     * 判断是否能结束游戏：
+     * ①游戏已结束：是否平局？
+     * ②分数差距过大
+     */
+    private void judgeWinner() {
+        //以下：一般判断
+        if (model.isGameEnded()) {
+            if (view2.getScoreBoard()[0][0] > view2.getScoreBoard()[0][1]) {
+                //winner: player_0
+            }else if (view2.getScoreBoard()[0][0] < view2.getScoreBoard()[0][1]) {
+                //winner: player_1
+            }else if (view2.getScoreBoard()[1][0] < view2.getScoreBoard()[1][1]) {
+                //winner: player_0
+            }else if (view2.getScoreBoard()[1][0] > view2.getScoreBoard()[1][1]) {
+                //winner: player_1
+            }else {
+                //平局
+            }
+        }
+        //以下：提前结束
+        if (view2.getScoreBoard()[0][0] - view2.getScoreBoard()[0][1] > model.getRemainderMineNum()) {
+            //winner: player_0
+        }else if (view2.getScoreBoard()[0][0] - view2.getScoreBoard()[0][1] == model.getRemainderMineNum() &&
+                  view2.getScoreBoard()[1][0] < view2.getScoreBoard()[1][1]) {
+            //winner: player_0
+        }else if (view2.getScoreBoard()[0][1] - view2.getScoreBoard()[0][0] > model.getRemainderMineNum()) {
+            //winner: player_1
+        }else if (view2.getScoreBoard()[0][1] - view2.getScoreBoard()[0][0] == model.getRemainderMineNum() &&
+                  view2.getScoreBoard()[1][1] < view2.getScoreBoard()[1][0]) {
+            //winner: player_1
+        }
     }
 }

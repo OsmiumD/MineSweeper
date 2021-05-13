@@ -5,7 +5,7 @@ import java.awt.*;
 import java.io.FileInputStream;
 
 public class ScoreBoard extends JComponent {
-    private final int[][] scoreBoard;
+    private final int[][] scoreBoard;//[0:得分; 1:失分][players]
     private static Font font;
 
     static {
@@ -28,6 +28,7 @@ public class ScoreBoard extends JComponent {
 
     @Override
     public void paint(Graphics g) {
+        //窗口内容
         super.paint(g);
         g.drawString("Player1-score:", 40, 40);
         g.drawString("Player2-score:", 40, 80);
@@ -46,5 +47,9 @@ public class ScoreBoard extends JComponent {
 
     public void lose (int player) {
         scoreBoard[1][player] ++;
+    }
+
+    public int[][] getScoreBoard() {
+        return scoreBoard;
     }
 }

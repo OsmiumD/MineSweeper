@@ -5,12 +5,16 @@ public class Board {
     private int row;
     private int column;
     private int mineNum;
+    private int remainderMineNum;//没翻开 且 没flag的雷
+    private boolean gameEnded;//在GameController.judgeWinner()中用到
 
     public Board(int row, int col, int mineNum) {
         grid = new Square[row][col];
         this.column = col;
         this.row = row;
-        this.mineNum=mineNum;
+        this.mineNum = mineNum;
+        remainderMineNum = mineNum;
+        this.gameEnded = false;
 
         iniGrid();
         iniItem();
@@ -42,6 +46,7 @@ public class Board {
                 }
             }
         }
+        // 是否要去掉这一格？
         return cnt;
     }
 
@@ -82,5 +87,40 @@ public class Board {
 
     public int getColumn() {
         return column;
+    }
+
+    public void setGameEnded(boolean gameEnded) {
+        this.gameEnded = gameEnded;
+    }
+
+    public boolean isGameEnded() {
+        return gameEnded;
+    }
+
+    public int getRemainderMineNum() {
+        return remainderMineNum;
+    }
+    /**
+     * 随机生成雷
+     * 已完成：3.2 避免首发碰雷（应在第一次点击后调用此方法）
+     * TODO: 3.1 避免过度密集
+     * TODO: 3.3 透视雷的位置
+     */
+    private void randomLandMine() {
+        //mineNum = 0;
+        for (int i = 0; i < mineNum; i++) {
+            //i仅起到计数的作用，即保证生成mineNum个雷
+            int randomRow = (int) (Math.random() * row);
+            int randomCol = (int) (Math.random() * column);
+            /* 第二个判断条件：第一次点击不爆雷
+               应在第一次点击后调用此方法
+             */
+            if (getGridAt(new BoardLocation(randomRow, randomCol)).hasLandMine() ||
+                    getGridAt(new BoardLocation(randomRow, randomCol)).isOpened()) {
+                i--;
+            }else {
+                getGridAt(new BoardLocation(randomRow, randomCol)).setHasLandMine(true);
+            }
+        }
     }
 }

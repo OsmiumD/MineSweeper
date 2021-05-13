@@ -4,6 +4,7 @@ import javax.swing.*;
 import java.awt.*;
 
 public class SquareComponent extends JPanel {
+    //一个方块
     private static Image grid = Toolkit.getDefaultToolkit().getImage("src/xyz/view/pic/emptygrid.png");
     private int size;
 

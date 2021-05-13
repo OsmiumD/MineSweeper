@@ -13,15 +13,15 @@ public enum Difficulty {
         this.mine=mine;
     }
 
+    public int getRow() {
+        return row;
+    }
+
     public int getCol() {
         return col;
     }
 
     public int getMine() {
         return mine;
-    }
-
-    public int getRow() {
-        return row;
     }
 }

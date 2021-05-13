@@ -55,7 +55,7 @@ public class Square {
         if(hasLandMine)return 9;//land mine
         if(!isOpened)return 10;//closed
         return numberOfLandMine;
-        // TODO: You should implement the method to give the number of the item store in the grid
+        // TODO: You should implement the method to give the number of the item stored in the grid
     }
 
 
