@@ -14,11 +14,8 @@ public class ItemUtil {
 
     public static Image genItem (int i) {
         switch (i) {
-            case 0: return empty;
             case 10: return mask;
-            default: return mask;
+            default: return empty;
         }
-        // TODO: This is just a sample. You should implement the method here to provide the visible component according to the argument i
-
     }
 }
