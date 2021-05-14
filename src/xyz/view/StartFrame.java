@@ -10,28 +10,58 @@ public class StartFrame extends JFrame {
 
     public StartFrame() {
         setTitle("Select");
-        setSize(100, 400);
+        setSize(300, 400);
         setLocationRelativeTo(null); // Center the window.
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         setLayout(null);
 
         JButton offline = new JButton("offline");
         offline.setSize(80, 20);
-        offline.setLocation(90, 50);
-        add(offline);
+        offline.setLocation(110, 50);
 
-        JButton customize=new JButton("自定义大小");//目前大小就自己输进去，只是为了测试能不能自动改BoardComponent大小
-        customize.setSize(120,20);
-        customize.setLocation(60,150);
-        customize.addActionListener(e->initGame(5,36,10));
-        add(customize);
-        ArrayList<JButton> difButtons = initDifButton();
+        JButton customize = new JButton("customize");//目前大小就自己输进去，只是为了测试能不能自动改BoardComponent大小
+        customize.setSize(120, 20);
+        customize.setLocation(90, 220);
+
+        JButton customizeStart = new JButton("start");
+        customizeStart.setSize(80, 20);
+        customizeStart.setLocation(110, 300);
+
+        JPanel startPanel = new JPanel();
+        startPanel.setLayout(null);
+        startPanel.setSize(400, 400);
+        startPanel.add(offline);
+        add(startPanel);
+
+        JPanel difSelectPanel = new JPanel();
+        ComponentBackButton difBack = new ComponentBackButton(startPanel, difSelectPanel);
+        difSelectPanel.setLayout(null);
+        difSelectPanel.setSize(400, 400);
+        difSelectPanel.add(difBack);
+        difSelectPanel.add(customize);
+        ArrayList<JButton> difButtons = initDifButton(difSelectPanel);
+        difSelectPanel.setVisible(false);
+        add(difSelectPanel);
+
+        CustomizeDifPanel customizeDifPanel = new CustomizeDifPanel();
+        customizeDifPanel.add(new ComponentBackButton(difSelectPanel, customizeDifPanel));
+        customizeDifPanel.setVisible(false);
+        customizeDifPanel.add(customizeStart);
+        add(customizeDifPanel);
 
         offline.addActionListener(e -> {
-            offline.setVisible(false);
-            customize.setVisible(false);
-            for (JButton button : difButtons) {
-                button.setVisible(true);
+            startPanel.setVisible(false);
+            difSelectPanel.setVisible(true);
+        });
+
+        customize.addActionListener(e -> {
+            customizeDifPanel.setVisible(true);
+            difSelectPanel.setVisible(false);
+        });
+
+        customizeStart.addActionListener(e -> {
+            if (customizeDifPanel.isDataAvailable()) {
+                initGame(customizeDifPanel.getCol(), customizeDifPanel.getRow(), customizeDifPanel.getMineNum());
             }
         });
     }
@@ -39,14 +69,14 @@ public class StartFrame extends JFrame {
     private BoardComponent initBoardComponent(int row, int col) {
         int MAX_BOARD_WIDTH = 1000;
         int MAX_BOARD_HEIGHT = 600;
-        double ratioBoard=((double) MAX_BOARD_WIDTH)/((double) MAX_BOARD_HEIGHT);
+        double ratioBoard = ((double) MAX_BOARD_WIDTH) / ((double) MAX_BOARD_HEIGHT);
         int width, height;
-        if(col*ratioBoard>row){
-            height= MAX_BOARD_HEIGHT;
-            width=height/col*row;
-        }else{
-            width= MAX_BOARD_WIDTH;
-            height=width/row*col;
+        if (col * ratioBoard > row) {
+            height = MAX_BOARD_HEIGHT;
+            width = height / col * row;
+        } else {
+            width = MAX_BOARD_WIDTH;
+            height = width / row * col;
         }
         return new BoardComponent(row, col, width, height);
     }
@@ -67,30 +97,33 @@ public class StartFrame extends JFrame {
         Board board = initBoard(row, col, mineNum);
         ScoreBoard scoreBoard = new ScoreBoard();
         width += scoreBoard.getWidth();
-        height=Math.max(scoreBoard.getHeight(), height);
-        scoreBoard.setLocation(boardComponent.getWidth()-20, 0);
+        height = Math.max(scoreBoard.getHeight(), height);
+        scoreBoard.setLocation(boardComponent.getWidth() - 20, 40);
         GameController gameController = new GameController(boardComponent, board, scoreBoard);
 
         GameFrame gameFrame = new GameFrame();
+        FrameBackButton gameBack = new FrameBackButton(this, gameFrame);
+        gameBack.setSize(80, 20);
+        gameBack.setLocation(boardComponent.getWidth(), 0);
         gameFrame.setSize(width, height);
         gameFrame.setLocationRelativeTo(null);
         gameFrame.add(boardComponent);
         gameFrame.add(scoreBoard);
+        gameFrame.add(gameBack);
         gameFrame.setVisible(true);
         setVisible(false);
     }
 
-    private ArrayList<JButton> initDifButton() {
+    private ArrayList<JButton> initDifButton(JComponent component) {
         ArrayList<JButton> difButtons = new ArrayList<>();
-        int y = 50;
+        int y = 40;
         for (Difficulty dif : Difficulty.values()) {
             JButton button = new JButton(dif.toString());
             button.setSize(80, 20);
-            button.setLocation(90, y);
-            button.setVisible(false);
+            button.setLocation(110, y);
             button.addActionListener(e -> initGame(dif));
-            y += 100;
-            add(button);
+            y += 60;
+            component.add(button);
             difButtons.add(button);
         }
         return difButtons;

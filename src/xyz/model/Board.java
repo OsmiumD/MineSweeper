@@ -46,7 +46,6 @@ public class Board {
                 }
             }
         }
-        // 是否要去掉这一格？
         return cnt;
     }
 
