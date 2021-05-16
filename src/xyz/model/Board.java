@@ -5,8 +5,8 @@ public class Board {
     private int row;
     private int column;
     private int mineNum;
-    private int remainderMineNum;//没翻开 且 没flag的雷
-    private boolean gameEnded;//在GameController.judgeWinner()中用到
+    private int remainderMineNum;//没翻开(且没flag)的雷
+    private byte gameState;//0:还没开始；1:正在进行；2:已结束; 在GameController.judgeWinner()中用到
 
     public Board(int row, int col, int mineNum) {
         grid = new Square[row][col];
@@ -14,7 +14,7 @@ public class Board {
         this.row = row;
         this.mineNum = mineNum;
         remainderMineNum = mineNum;
-        this.gameEnded = false;
+        gameState = 0;
 
         iniGrid();
         iniItem();
@@ -30,7 +30,14 @@ public class Board {
 
     public void iniItem () {
         // TODO: This is only a demo implementation.
-        grid[0][0].setNumberOfLandMine((byte) 3);
+        //TODO: 调用randomLandMine()，不过此时不能保证不首发触雷。
+        for (int i = 0; i < row; i++) {
+            for (int j = 0; j < column; j++) {
+                grid[i][j].setNumberOfLandMine(calculateNum(i,j));
+                // 初始化参数，所以在Square的Constructor中不用写初始化
+            }
+        }
+        //grid[0][0].setNumberOfLandMine((byte) 3);
     }
 
     /**
@@ -80,25 +87,6 @@ public class Board {
         }
     }
 
-    public int getRow() {
-        return row;
-    }
-
-    public int getColumn() {
-        return column;
-    }
-
-    public void setGameEnded(boolean gameEnded) {
-        this.gameEnded = gameEnded;
-    }
-
-    public boolean isGameEnded() {
-        return gameEnded;
-    }
-
-    public int getRemainderMineNum() {
-        return remainderMineNum;
-    }
     /**
      * 随机生成雷
      * 已完成：3.2 避免首发碰雷（应在第一次点击后调用此方法）
@@ -121,5 +109,38 @@ public class Board {
                 getGridAt(new BoardLocation(randomRow, randomCol)).setHasLandMine(true);
             }
         }
+    }
+
+    public boolean isAllGridOpened() {
+        for (int i = 0; i < row; i++) {
+            for (int j = 0; j < column; j++) {
+                if (!grid[i][j].isOpened()) return false;
+            }
+        }
+        return true;
+    }
+
+    public int getRow() {
+        return row;
+    }
+
+    public int getColumn() {
+        return column;
+    }
+
+    public byte getGameState() {
+        return gameState;
+    }
+
+    public void setGameState(byte gameState) {
+        this.gameState = gameState;
+    }
+
+    public int getRemainderMineNum() {
+        return remainderMineNum;
+    }
+
+    public Square[][] getGrid() {
+        return grid;
     }
 }

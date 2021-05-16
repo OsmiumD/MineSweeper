@@ -43,9 +43,9 @@ public class SquareComponent extends JPanel {
         if (image != null) {
             g.drawImage(image, spacing, spacing, getWidth() - 2 * spacing, getHeight() - 2 * spacing, this);
         }
-        if(num>0&&num<9){
+        if(num > 0 && num < 9){
             g.setFont(font);
-            g.drawString(""+num ,(int)(size/2.9),(int)(size/1.5));
+            g.drawString(""+num, (int)(size/2.9), (int)(size/1.5));
         }
     }
 }

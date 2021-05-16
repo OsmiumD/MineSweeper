@@ -12,7 +12,8 @@ public class Square {
         isOpened = false;
         isFlag = false;
         hasLandMine = false;
-        numberOfLandMine = 0;
+        //numberOfLandMine = xxx;
+        // 上一行的Initialize在Board.iniItem()中进行
     }
 
     public BoardLocation getLocation () {
@@ -52,8 +53,8 @@ public class Square {
     }
 
     public int getNum () {
-        if(hasLandMine)return 9;//land mine
-        if(!isOpened)return 10;//closed
+        if (hasLandMine) return 9;//land mine
+        if (!isOpened) return 10;//closed
         return numberOfLandMine;
         // TODO: You should implement the method to give the number of the item stored in the grid
     }
