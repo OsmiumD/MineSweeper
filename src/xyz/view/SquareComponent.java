@@ -45,6 +45,7 @@ public class SquareComponent extends JPanel {
         }
         if(num > 0 && num < 9){
             g.setFont(font);
+            g.setColor(Colors.NUMBERS.getColors()[num]);
             g.drawString(""+num, (int)(size/2.9), (int)(size/1.5));
         }
     }
