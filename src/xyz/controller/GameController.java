@@ -11,8 +11,11 @@ public class GameController implements GameListener {
     private final Board model;
     private int currentPlayer;
     private boolean cheatMode;//false:关闭， true:开启
+    private byte gameState;//0:还没开始；1:正在进行；2:已结束; 在GameController.judgeWinner()中用到
+    private byte steps;//一个player可以走的步数
+    private byte stepCnt;//给steps计数
 
-    public GameController (BoardComponent component, Board board, ScoreBoard scoreBoard) {
+    public GameController(BoardComponent component, Board board, ScoreBoard scoreBoard) {
         this.view1 = component;
         this.view2 = scoreBoard;
         this.model = board;
@@ -20,11 +23,14 @@ public class GameController implements GameListener {
         initialGameState();
     }
 
-    public void initialGameState () {
+    public void initialGameState() {
         cheatMode = false;
         currentPlayer = 0;
         int num;
         BoardLocation location;
+        gameState = 0;
+        steps = 1;//TODO: 自定义一共走的步数
+        stepCnt = 0;
         for (int row = 0; row < model.getRow(); row ++) {
             for (int col = 0; col < model.getColumn(); col ++) {
                 location = new BoardLocation(row, col);
@@ -36,16 +42,21 @@ public class GameController implements GameListener {
     }
 
     public void nextPlayer() {
-        currentPlayer = currentPlayer == 0 ? 1 : 0;
+        stepCnt++;
+        if (stepCnt == steps) {
+            stepCnt = 0;
+            currentPlayer = (currentPlayer == 0) ? 1 : 0;
+        }
     }
 
     @Override
     public void onPlayerLeftClick(BoardLocation location, SquareComponent component) {
         printMessage(location, "left");
-        if (model.getGameState() == 0){
-            model.setGameState((byte) 1);
+        if (gameState == 0) {
+            gameState = 1;
             //TODO: 首发不触雷
         }
+
         // demo里的，先不删
         /*
         Square clickedGrid = model.getGridAt(location);
@@ -65,7 +76,7 @@ public class GameController implements GameListener {
         view1.setItemAt(location, clickedGrid.getNum());
         repaintAll();
         if (model.isAllGridOpened()) {
-            model.setGameState((byte) 2);//全部open，游戏结束
+            gameState = 2;//全部open，游戏结束
         }
         judgeWinner();
         nextPlayer();
@@ -90,7 +101,7 @@ public class GameController implements GameListener {
         view1.setItemAt(location, clickedGrid.getNum());
         repaintAll();
         if (model.isAllGridOpened()) {
-            model.setGameState((byte) 2);//全部open，游戏结束
+            gameState = 2;//全部open，游戏结束
         }
         judgeWinner();
         nextPlayer();
@@ -123,10 +134,6 @@ public class GameController implements GameListener {
                 }
             }
         }
-        if (model.isAllGridOpened()) {
-            model.setGameState((byte) 2);//全部open，游戏结束
-        }
-        judgeWinner();
         repaintAll();
     }
 
@@ -150,7 +157,7 @@ public class GameController implements GameListener {
     private void judgeWinner() {
         boolean winnerIsDetermined = false;
         //以下：一般判断（所有的格子都open）
-        if (model.getGameState() == 2) {
+        if (gameState == 2) {
             if (view2.getScoreBoard()[0][0] > view2.getScoreBoard()[0][1]) {
                 winnerIsDetermined = true;
                 //winner: player_0
@@ -185,10 +192,10 @@ public class GameController implements GameListener {
             winnerIsDetermined = true;
             //winner: player_1
         }
-        System.out.printf("\njudge winner, gameState is %d", model.getGameState());
+        System.out.printf("\njudge winner, gameState is %d", gameState);
         if (winnerIsDetermined) {
             System.out.print("\nGame Ended.\n");
-            //TODO:取消（所有？至少按键不要）Listener注册；显示输赢
+            //TODO:取消（所有？至少返回按键不要）Listener注册；显示输赢
         }
     }
 }

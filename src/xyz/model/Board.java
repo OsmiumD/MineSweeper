@@ -6,7 +6,6 @@ public class Board {
     private int column;
     private int mineNum;
     private int remainderMineNum;//没翻开(且没flag)的雷
-    private byte gameState;//0:还没开始；1:正在进行；2:已结束; 在GameController.judgeWinner()中用到
 
     public Board(int row, int col, int mineNum) {
         grid = new Square[row][col];
@@ -14,7 +13,6 @@ public class Board {
         this.row = row;
         this.mineNum = mineNum;
         remainderMineNum = mineNum;
-        gameState = 0;
 
         iniGrid();
         iniItem();
@@ -126,14 +124,6 @@ public class Board {
 
     public int getColumn() {
         return column;
-    }
-
-    public byte getGameState() {
-        return gameState;
-    }
-
-    public void setGameState(byte gameState) {
-        this.gameState = gameState;
     }
 
     public int getRemainderMineNum() {
