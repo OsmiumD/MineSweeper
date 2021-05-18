@@ -14,10 +14,14 @@ public class ItemUtil {
         mine = toolkit.getImage("src/xyz/view/pic/mine.png");
     }
 
-    public static Image genItem (int i) {
+    public static Image genItem(int i) {
         switch (i) {
-            case 10: return mask;
-            default: return empty;
+            case 10:
+                return mask;
+            case 9:
+                return mine;
+            default:
+                return empty;
         }
     }
 }

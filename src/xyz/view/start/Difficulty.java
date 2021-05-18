@@ -1,4 +1,4 @@
-package xyz.view;
+package xyz.view.start;
 
 
 public enum Difficulty {

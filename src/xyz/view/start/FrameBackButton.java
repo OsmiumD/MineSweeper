@@ -1,5 +1,5 @@
 //用于两个JFrame之间的Back
-package xyz.view;
+package xyz.view.start;
 
 import javax.swing.*;
 public class FrameBackButton extends JButton{

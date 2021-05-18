@@ -1,5 +1,5 @@
 //用于两个Component之间的back
-package xyz.view;
+package xyz.view.start;
 
 import javax.swing.*;
 

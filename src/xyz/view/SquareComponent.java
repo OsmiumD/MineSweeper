@@ -23,7 +23,7 @@ public class SquareComponent extends JPanel {
     public SquareComponent (int size) {
         setLayout(new GridLayout(1, 1));
         setSize(size, size);
-        font = font.deriveFont(Font.PLAIN, (float) (size/1.4));
+        font = font.deriveFont(Font.BOLD, (float) (size/1.4));
         this.size = size;
     }
 

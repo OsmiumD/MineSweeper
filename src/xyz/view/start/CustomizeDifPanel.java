@@ -1,4 +1,4 @@
-package xyz.view;
+package xyz.view.start;
 
 import javax.swing.*;
 import java.awt.*;
@@ -21,7 +21,7 @@ public class CustomizeDifPanel extends JPanel {
 
     CustomizeDifPanel() {
         setLayout(null);
-        setSize(400, 400);
+        setSize(300, 400);
 
         JLabel rowLabel = new JLabel("Row(9-30):");
         rowLabel.setSize(100, 20);

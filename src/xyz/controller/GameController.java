@@ -1,6 +1,7 @@
 package xyz.controller;
 
 //import org.jetbrains.annotations.NotNull;
+
 import xyz.listener.GameListener;
 import xyz.model.*;
 import xyz.view.*;
@@ -31,13 +32,13 @@ public class GameController implements GameListener {
         gameState = 0;
         steps = 1;//TODO: 自定义一共走的步数
         stepCnt = 0;
-        for (int row = 0; row < model.getRow(); row ++) {
-            for (int col = 0; col < model.getColumn(); col ++) {
+        for (int row = 0; row < model.getRow(); row++) {
+            for (int col = 0; col < model.getColumn(); col++) {
                 location = new BoardLocation(row, col);
                 num = model.getNumAt(location);
                 view1.setItemAt(location, num);
             }
-         }
+        }
 
         view1.repaint();
     }
@@ -107,7 +108,7 @@ public class GameController implements GameListener {
             // 有雷，则插旗；加分
             model.flagGrid(location);
             view2.goal(currentPlayer);
-        }else {
+        } else {
             // 没雷，则正常翻开；扣分
             view2.lose(currentPlayer);
             // TODO: project描述2.2中要在这里”提示：标记错误“
@@ -138,6 +139,9 @@ public class GameController implements GameListener {
                     if (!model.getGrid()[i][j].isOpened()) {
                         view1.setItemAt(model.getGrid()[i][j].getLocation(), model.getGrid()[i][j].getNumberOfLandMine());
                     }
+                    if (model.getGrid()[i][j].hasLandMine()) {
+                        view1.setItemAt(model.getGrid()[i][j].getLocation(), 9);
+                    }
                 }
             }
         } else {
@@ -155,14 +159,14 @@ public class GameController implements GameListener {
         repaintAll();
     }
 
-    private void printMessage (BoardLocation location, String str) {
+    private void printMessage(BoardLocation location, String str) {
         int row_in_message = location.getRow();
         int column_in_message = location.getColumn();
         String format = "\nOn Player %d %s click at (%d, %d), ";
         System.out.printf(format, currentPlayer, str, row_in_message + 1, column_in_message + 1);
     }
 
-    private void repaintAll(){
+    private void repaintAll() {
         view1.repaint();
         view2.repaint();
     }
@@ -179,16 +183,16 @@ public class GameController implements GameListener {
             if (view2.getScoreBoard()[0][0] > view2.getScoreBoard()[0][1]) {
                 winnerIsDetermined = true;
                 //winner: player_0
-            }else if (view2.getScoreBoard()[0][0] < view2.getScoreBoard()[0][1]) {
+            } else if (view2.getScoreBoard()[0][0] < view2.getScoreBoard()[0][1]) {
                 winnerIsDetermined = true;
                 //winner: player_1
-            }else if (view2.getScoreBoard()[1][0] < view2.getScoreBoard()[1][1]) {
+            } else if (view2.getScoreBoard()[1][0] < view2.getScoreBoard()[1][1]) {
                 winnerIsDetermined = true;
                 //winner: player_0
-            }else if (view2.getScoreBoard()[1][0] > view2.getScoreBoard()[1][1]) {
+            } else if (view2.getScoreBoard()[1][0] > view2.getScoreBoard()[1][1]) {
                 winnerIsDetermined = true;
                 //winner: player_1
-            }else {
+            } else {
                 winnerIsDetermined = true;
                 System.out.print("\nTie Game! No Winner!");
                 //平局
@@ -198,15 +202,15 @@ public class GameController implements GameListener {
         if (view2.getScoreBoard()[0][0] - view2.getScoreBoard()[0][1] > model.getRemainderMineNum()) {
             winnerIsDetermined = true;
             //winner: player_0
-        }else if (view2.getScoreBoard()[0][0] - view2.getScoreBoard()[0][1] == model.getRemainderMineNum() &&
-                  view2.getScoreBoard()[1][0] < view2.getScoreBoard()[1][1]) {
+        } else if (view2.getScoreBoard()[0][0] - view2.getScoreBoard()[0][1] == model.getRemainderMineNum() &&
+                view2.getScoreBoard()[1][0] < view2.getScoreBoard()[1][1]) {
             winnerIsDetermined = true;
             //winner: player_0
-        }else if (view2.getScoreBoard()[0][1] - view2.getScoreBoard()[0][0] > model.getRemainderMineNum()) {
+        } else if (view2.getScoreBoard()[0][1] - view2.getScoreBoard()[0][0] > model.getRemainderMineNum()) {
             winnerIsDetermined = true;
             //winner: player_1
-        }else if (view2.getScoreBoard()[0][1] - view2.getScoreBoard()[0][0] == model.getRemainderMineNum() &&
-                  view2.getScoreBoard()[1][1] < view2.getScoreBoard()[1][0]) {
+        } else if (view2.getScoreBoard()[0][1] - view2.getScoreBoard()[0][0] == model.getRemainderMineNum() &&
+                view2.getScoreBoard()[1][1] < view2.getScoreBoard()[1][0]) {
             winnerIsDetermined = true;
             //winner: player_1
         }

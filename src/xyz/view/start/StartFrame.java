@@ -1,42 +1,51 @@
-package xyz.view;
+package xyz.view.start;
 
 import xyz.controller.GameController;
 import xyz.model.Board;
+import xyz.view.BoardComponent;
+import xyz.view.GameFrame;
+import xyz.view.ScoreBoard;
 
 import javax.swing.*;
+import java.io.InputStream;
 import java.util.ArrayList;
 
 public class StartFrame extends JFrame {
 
     public StartFrame() {
         setTitle("Select");
-        setSize(300, 400);
+        setSize(400, 400);
         setLocationRelativeTo(null); // Center the window.
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         setLayout(null);
 
         JButton offline = new JButton("offline");
         offline.setSize(80, 20);
-        offline.setLocation(110, 50);
+        offline.setLocation(60, 50);
 
         JButton customize = new JButton("customize");//目前大小就自己输进去，只是为了测试能不能自动改BoardComponent大小
         customize.setSize(120, 20);
-        customize.setLocation(90, 220);
+        customize.setLocation(40, 220);
 
         JButton customizeStart = new JButton("start");
         customizeStart.setSize(80, 20);
-        customizeStart.setLocation(110, 300);
+        customizeStart.setLocation(60, 300);
+
+        JButton loadGame = new JButton("Load Game");
+        loadGame.setSize(120, 20);
+        loadGame.setLocation(40, 210);
 
         JPanel startPanel = new JPanel();
         startPanel.setLayout(null);
-        startPanel.setSize(400, 400);
+        startPanel.setSize(200, 400);
         startPanel.add(offline);
+        startPanel.add(loadGame);
         add(startPanel);
 
         JPanel difSelectPanel = new JPanel();
         ComponentBackButton difBack = new ComponentBackButton(startPanel, difSelectPanel);
         difSelectPanel.setLayout(null);
-        difSelectPanel.setSize(400, 400);
+        difSelectPanel.setSize(200, 400);
         difSelectPanel.add(difBack);
         difSelectPanel.add(customize);
         ArrayList<JButton> difButtons = initDifButton(difSelectPanel);
@@ -48,6 +57,9 @@ public class StartFrame extends JFrame {
         customizeDifPanel.setVisible(false);
         customizeDifPanel.add(customizeStart);
         add(customizeDifPanel);
+
+        JPanel playerSettingPanel = new JPanel();
+
 
         offline.addActionListener(e -> {
             startPanel.setVisible(false);
@@ -63,6 +75,16 @@ public class StartFrame extends JFrame {
             if (customizeDifPanel.isDataAvailable()) {
                 initGame(customizeDifPanel.getCol(), customizeDifPanel.getRow(), customizeDifPanel.getMineNum());
             }
+        });
+
+        loadGame.addActionListener(e -> {
+            FileNameFrame loadFrame = new FileNameFrame();
+            loadFrame.setTitle("Load Game");
+            loadFrame.setVisible(true);
+            loadFrame.addActionListener(e1 -> {
+                InputStream load = loadFrame.getInputStream();
+                //TODO:用InputStream初始化Board和Square并启动
+            });
         });
     }
 
@@ -120,7 +142,7 @@ public class StartFrame extends JFrame {
         for (Difficulty dif : Difficulty.values()) {
             JButton button = new JButton(dif.toString());
             button.setSize(80, 20);
-            button.setLocation(110, y);
+            button.setLocation(60, y);
             button.addActionListener(e -> initGame(dif));
             y += 60;
             component.add(button);
