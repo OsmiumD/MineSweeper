@@ -1,6 +1,8 @@
 package xyz.model;
 
-public class Square {
+import java.io.Serializable;
+
+public class Square implements Serializable {
     private BoardLocation location;
     private boolean isOpened;//目前，opened意为“已结算”，无论一个格子是被左击还是右击，都会setOpened(true)
     private boolean isFlag;

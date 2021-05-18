@@ -1,13 +1,14 @@
 package xyz.view.start;
 
 import xyz.controller.GameController;
+import xyz.controller.ReadSave;
 import xyz.model.Board;
 import xyz.view.BoardComponent;
 import xyz.view.GameFrame;
 import xyz.view.ScoreBoard;
 
 import javax.swing.*;
-import java.io.InputStream;
+import java.io.*;
 import java.util.ArrayList;
 
 public class StartFrame extends JFrame {
@@ -85,10 +86,23 @@ public class StartFrame extends JFrame {
             loadFrame.setTitle("Load Game");
             loadFrame.setVisible(true);
             loadFrame.addActionListener(e1 -> {
-                InputStream load = loadFrame.getInputStream();
-                //TODO:用InputStream初始化Board和Square并启动
+                loadGame(loadFrame.getFile());
             });
         });
+    }
+
+    private void loadGame(File file) {
+        try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(file))) {
+            ReadSave rs = (ReadSave) ois.readObject();
+            Board board = rs.getBoard();
+            ScoreBoard scoreBoard = rs.getScoreBoard();
+            GameController controller = rs.getController();
+            BoardComponent boardComponent = initBoardComponent(board.getRow(), board.getColumn());
+            boardComponent.registerListener(controller);
+
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
     }
 
     private BoardComponent initBoardComponent(int row, int col) {
@@ -115,7 +129,6 @@ public class StartFrame extends JFrame {
     }
 
     private void initGame(int row, int col, int mineNum) {
-        System.out.println(playerSettingPanel.getPlayerCount());
         int width = 50, height = 50;
         BoardComponent boardComponent = initBoardComponent(row, col);
         width += boardComponent.getWidth();
@@ -132,11 +145,20 @@ public class StartFrame extends JFrame {
         FrameBackButton gameBack = new FrameBackButton(this, gameFrame);
         gameBack.setSize(80, 20);
         gameBack.setLocation(boardComponent.getWidth(), 0);
+
+        JButton save = new JButton("save");
+        save.setSize(80, 20);
+        save.setLocation(boardComponent.getWidth() + 80, 0);
+        save.addActionListener(e -> {
+            gameController.saveGame();
+        });
+
         gameFrame.setSize(width, height);
         gameFrame.setLocationRelativeTo(null);
         gameFrame.add(boardComponent);
         gameFrame.add(scoreBoard);
         gameFrame.add(gameBack);
+        gameFrame.add(save);
         gameFrame.setVisible(true);
         setVisible(false);
     }

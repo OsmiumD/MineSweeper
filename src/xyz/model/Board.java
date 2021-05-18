@@ -1,6 +1,8 @@
 package xyz.model;
 
-public class Board {
+import java.io.Serializable;
+
+public class Board implements Serializable {
     private Square[][] grid;
     private int row;
     private int column;

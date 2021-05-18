@@ -21,7 +21,7 @@ public class CustomizeDifPanel extends JPanel {
 
     CustomizeDifPanel() {
         setLayout(null);
-        setSize(225, 400);
+        setSize(225 , 400);
 
         JLabel rowLabel = new JLabel("Row(9-30):");
         rowLabel.setSize(100, 20);

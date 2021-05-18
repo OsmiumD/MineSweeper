@@ -21,15 +21,21 @@ public class ReadSave implements Serializable{
     ScoreBoard scoreBoard;
     GameController controller;
 
-    ReadSave(Board board, ScoreBoard scoreBoard, GameController controller) {
+    public ReadSave(Board board, ScoreBoard scoreBoard, GameController controller) {
         this.board = board;
         this.scoreBoard = scoreBoard;
         this.controller = controller;
     }
 
-    public static String currentTime() {
-        LocalDateTime time = LocalDateTime.now();
-        DateTimeFormatter fmt = DateTimeFormatter.ofPattern("yyyyMMdd-HHmmss");
-        return time.format(fmt);
+    public Board getBoard() {
+        return board;
+    }
+
+    public GameController getController() {
+        return controller;
+    }
+
+    public ScoreBoard getScoreBoard() {
+        return scoreBoard;
     }
 }

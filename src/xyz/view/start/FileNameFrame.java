@@ -9,7 +9,6 @@ import java.io.*;
 
 public class FileNameFrame extends JFrame {
     private File file;
-    private InputStream inputStream;
     private ActionListener el;
 
     public FileNameFrame() {
@@ -31,19 +30,11 @@ public class FileNameFrame extends JFrame {
             }
             if (e.getActionCommand().equals("ApproveSelection")) {
                 file = chooser.getSelectedFile();
-                try{
-                    inputStream=new FileInputStream(file);
-                }catch (Exception exception){
-                    exception.printStackTrace();
-                }
             }
             el.actionPerformed(e);
         });
     }
 
-    public InputStream getInputStream() {
-        return inputStream;
-    }
 
     public File getFile() {
         return file;

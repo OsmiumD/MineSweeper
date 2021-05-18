@@ -1,6 +1,8 @@
 package xyz.model;
 
-public class BoardLocation {
+import java.io.Serializable;
+
+public class BoardLocation implements Serializable {
     private int row;
     private int column;
 

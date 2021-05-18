@@ -6,7 +6,14 @@ import xyz.listener.GameListener;
 import xyz.model.*;
 import xyz.view.*;
 
-public class GameController implements GameListener {
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+
+public class GameController implements GameListener, Serializable {
     private final BoardComponent view1;
     private final ScoreBoard view2;
     private final Board model;
@@ -51,7 +58,7 @@ public class GameController implements GameListener {
         stepCount++;
         if (stepCount == steps) {
             stepCount = 0;
-            currentPlayer = (currentPlayer == 0) ? 1 : 0;
+            currentPlayer = (currentPlayer ==   0) ? 1 : 0;
         }
     }
 
@@ -228,32 +235,21 @@ public class GameController implements GameListener {
             //view1.unregisterListener(this);
         }
     }
-
-    public int remainMineNum() {
-        return model.getRemainderMineNum();
+    public void saveGame() {
+        File file = new File(System.getenv("APPDATA") + "\\MineSweeperJavaA\\" + currentTime() + ".msv");
+        ReadSave rs = new ReadSave(model, view2, this);
+        try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(file))) {
+            oos.writeObject(rs);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
-    public int getGameState() {
-        return gameState;
+    public static String currentTime() {
+        LocalDateTime time = LocalDateTime.now();
+        DateTimeFormatter fmt = DateTimeFormatter.ofPattern("yyyyMMdd-HHmmss");
+        return time.format(fmt);
     }
 
-    public int getCurrentPlayer() {
-        return currentPlayer;
-    }
 
-    public byte getSteps() {
-        return steps;
-    }
-
-    public byte getStepCount() {
-        return stepCount;
-    }
-
-    public byte getPlayerCount() {
-        return playerCount;
-    }
-
-    public boolean isSequenceOpen() {
-        return sequenceOpen;
-    }
 }

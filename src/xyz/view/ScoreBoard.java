@@ -3,8 +3,9 @@ package xyz.view;
 import javax.swing.*;
 import java.awt.*;
 import java.io.FileInputStream;
+import java.io.Serializable;
 
-public class ScoreBoard extends JComponent {
+public class ScoreBoard extends JComponent implements Serializable {
     private final int[][] scoreBoard;//[0:得分; 1:失分][players]
     private static Font font;
     private final byte playerCount;
@@ -20,7 +21,7 @@ public class ScoreBoard extends JComponent {
     }
 
     public ScoreBoard(byte playerCount) {
-        setSize(200, 40*2*playerCount+40);
+        setSize(200, 40 * 2 * playerCount + 40);
         setLayout(null);
         setBackground(Color.BLACK);
         this.setFont(font);
@@ -34,15 +35,15 @@ public class ScoreBoard extends JComponent {
         super.paint(g);
         int y = 40;
         for (int i = 0; i < playerCount; i++) {
-            g.drawString("Player"+(i+1)+"-score:", 40, y);
+            g.drawString("Player" + (i + 1) + "-score:", 40, y);
             g.drawString("" + scoreBoard[0][i], 180, y);
-            y+=40;
+            y += 40;
         }
-        y+=20;
+        y += 20;
         for (int i = 0; i < playerCount; i++) {
-            g.drawString("Player"+(i+1)+"-lose:", 40, y);
+            g.drawString("Player" + (i + 1) + "-lose:", 40, y);
             g.drawString("" + scoreBoard[1][i], 180, y);
-            y+=40;
+            y += 40;
         }
     }
 
