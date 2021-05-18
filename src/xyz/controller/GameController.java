@@ -58,7 +58,7 @@ public class GameController implements GameListener, Serializable {
         stepCount++;
         if (stepCount == steps) {
             stepCount = 0;
-            currentPlayer = (currentPlayer ==   0) ? 1 : 0;
+            currentPlayer = (currentPlayer == 0) ? 1 : 0;
         }
     }
 
@@ -75,7 +75,6 @@ public class GameController implements GameListener, Serializable {
         }
         printMessage(location, "left");
         if (gameState == 0) {
-            //TODO: 首发不触雷
             gameState = 1;
         }
 
@@ -90,12 +89,16 @@ public class GameController implements GameListener, Serializable {
         */
 
         Square clickedGrid = model.getGridAt(location);
-        model.openGrid(location);
 
         if (clickedGrid.hasLandMine()) {
             view2.lose(currentPlayer);
         }
-        view1.setItemAt(location, clickedGrid.getNum());
+        if (sequenceOpen) {
+            sequenceOpen(location);
+        } else {
+            model.openGrid(location);
+            view1.setItemAt(location, clickedGrid.getNum());
+        }
         repaintAll();
         if (model.isAllGridClicked()) {
             gameState = 2;//全部open，游戏结束
@@ -231,10 +234,27 @@ public class GameController implements GameListener, Serializable {
         System.out.printf("\njudge winner, gameState is %d", gameState);
         if (winnerIsDetermined) {
             System.out.print("\nGame Ended.\n");
-            //TODO:取消（所有？至少返回按键不要）Listener注册；显示输赢
+            //TODO:取消（所有？至少返回按键不要）（返回键的Listener不是这样子的，可以取消）Listener注册；显示输赢
             //view1.unregisterListener(this);
         }
     }
+
+    public void sequenceOpen(BoardLocation location) {
+        if (!model.isLocationInBound(location)) return;
+        Square grid = model.getGridAt(location);
+        if (grid.isOpened()) return;
+        model.openGrid(location);
+        view1.setItemAt(location, grid.getNum());
+        if (grid.getNumberOfLandMine() != 0 || grid.hasLandMine()) return;
+        for (int i = -1; i <= 1; i++) {
+            for (int j = -1; j <= 1; j++) {
+                if (i == 0 && j == 0) continue;
+                sequenceOpen(new BoardLocation(location.getRow() + i, location.getColumn() + j));
+            }
+
+        }
+    }
+
     public void saveGame() {
         File file = new File(System.getenv("APPDATA") + "\\MineSweeperJavaA\\" + currentTime() + ".msv");
         ReadSave rs = new ReadSave(model, view2, this);

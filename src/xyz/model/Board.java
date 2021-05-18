@@ -1,6 +1,7 @@
 package xyz.model;
 
 import java.io.Serializable;
+import java.time.LocalDateTime;
 
 public class Board implements Serializable {
     private Square[][] grid;
@@ -20,7 +21,7 @@ public class Board implements Serializable {
         //iniItem();
     }
 
-    public void iniGrid () {
+    public void iniGrid() {
         for (int i = 0; i < row; i++) {
             for (int j = 0; j < column; j++) {
                 grid[i][j] = new Square(new BoardLocation(i, j));
@@ -28,11 +29,11 @@ public class Board implements Serializable {
         }
     }
 
-    public void iniItem () {
+    public void iniItem() {
         // TODO: This is only a demo implementation.
         for (int i = 0; i < row; i++) {
             for (int j = 0; j < column; j++) {
-                grid[i][j].setNumberOfLandMine(calculateNum(i,j));
+                grid[i][j].setNumberOfLandMine(calculateNum(i, j));
                 // 初始化参数，所以在Square的Constructor中不用写初始化
             }
         }
@@ -40,12 +41,13 @@ public class Board implements Serializable {
 
     /**
      * 计算grid[i][j]附近雷的数量，算上自己
+     *
      * @return 雷的数量
      */
-    public byte calculateNum (int i, int j) {
+    public byte calculateNum(int i, int j) {
         byte cnt = 0;
-        for (int m = i-1; m <= i+1; m++) {
-            for (int n = j-1; n <= j+1; n++) {
+        for (int m = i - 1; m <= i + 1; m++) {
+            for (int n = j - 1; n <= j + 1; n++) {
                 if (m >= 0 && n >= 0 && m < row && n < column) {
                     if (grid[m][n].hasLandMine()) cnt++;
                 }
@@ -69,14 +71,14 @@ public class Board implements Serializable {
         }
     }
 
-    public void flagGrid (BoardLocation location) {
+    public void flagGrid(BoardLocation location) {
         getGridAt(location).setFlag(true);
     }
 
     // click type == 1 means that is left click
     // click type == 2 means that is middle click
     // click type == 3 means that is right click
-    public boolean isValidClick (BoardLocation location, int clickType) {
+    public boolean isValidClick(BoardLocation location, int clickType) {
         // TODO: You should implement a method here to check whether it is a valid action
         switch (clickType) {
             case 1:
@@ -109,7 +111,7 @@ public class Board implements Serializable {
                     grid[randomRow][randomCol].isFlag() ||
                     (location.getRow() == randomRow && location.getColumn() == randomCol)) {
                 i--;
-            }else {
+            } else {
                 grid[randomRow][randomCol].setHasLandMine(true);
                 if (!isValidLandMine(randomRow, randomCol)) {
                     grid[randomRow][randomCol].setHasLandMine(false);
@@ -120,13 +122,13 @@ public class Board implements Serializable {
     }
 
     private boolean isValidLandMine(int i, int j) {
-        for (int m = i-1; m <= i+1 && 0 <= m && m < row; m++) {
-            for (int n = j-1; n <= j+1 && 0 <= n && n <= column; n++) {
-                if ((m == 0 || m == row-1) && (n == 0 || n == column-1)) {
+        for (int m = i - 1; m <= i + 1 && 0 <= m && m < row; m++) {
+            for (int n = j - 1; n <= j + 1 && 0 <= n && n <= column; n++) {
+                if ((m == 0 || m == row - 1) && (n == 0 || n == column - 1)) {
                     if (calculateNum(m, n) == 4) return false;//角上
-                }else if (m == 0 || m == row-1 || n == 0 || n == column-1) {
+                } else if (m == 0 || m == row - 1 || n == 0 || n == column - 1) {
                     if (calculateNum(m, n) == 6) return false;//边上
-                }else {
+                } else {
                     if (calculateNum(m, n) == 9) return false;//中间
                 }
             }
@@ -141,6 +143,11 @@ public class Board implements Serializable {
             }
         }
         return true;
+    }
+
+    public boolean isLocationInBound(BoardLocation location) {
+        return (location.getRow() >= 0 && location.getColumn() >= 0 &&
+                location.getRow() < row && location.getColumn() < column);
     }
 
     public int getRow() {
