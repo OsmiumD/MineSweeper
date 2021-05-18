@@ -12,10 +12,12 @@ import java.util.ArrayList;
 
 public class StartFrame extends JFrame {
 
+    private final PlayerSettingPanel playerSettingPanel;
+
     public StartFrame() {
         setTitle("Select");
         setSize(400, 400);
-        setLocationRelativeTo(null); // Center the window.
+        setLocationRelativeTo(null);
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         setLayout(null);
 
@@ -23,7 +25,7 @@ public class StartFrame extends JFrame {
         offline.setSize(80, 20);
         offline.setLocation(60, 50);
 
-        JButton customize = new JButton("customize");//目前大小就自己输进去，只是为了测试能不能自动改BoardComponent大小
+        JButton customize = new JButton("customize");
         customize.setSize(120, 20);
         customize.setLocation(40, 220);
 
@@ -58,7 +60,8 @@ public class StartFrame extends JFrame {
         customizeDifPanel.add(customizeStart);
         add(customizeDifPanel);
 
-        JPanel playerSettingPanel = new JPanel();
+        playerSettingPanel = new PlayerSettingPanel();
+        add(playerSettingPanel);
 
 
         offline.addActionListener(e -> {
@@ -112,16 +115,18 @@ public class StartFrame extends JFrame {
     }
 
     private void initGame(int row, int col, int mineNum) {
+        System.out.println(playerSettingPanel.getPlayerCount());
         int width = 50, height = 50;
         BoardComponent boardComponent = initBoardComponent(row, col);
         width += boardComponent.getWidth();
         height += boardComponent.getHeight();
         Board board = initBoard(row, col, mineNum);
-        ScoreBoard scoreBoard = new ScoreBoard();
+        ScoreBoard scoreBoard = new ScoreBoard(playerSettingPanel.getPlayerCount());
         width += scoreBoard.getWidth();
         height = Math.max(scoreBoard.getHeight(), height);
         scoreBoard.setLocation(boardComponent.getWidth() - 20, 40);
-        GameController gameController = new GameController(boardComponent, board, scoreBoard);
+        GameController gameController =
+                new GameController(boardComponent, board, scoreBoard, playerSettingPanel.getPlayerCount(), playerSettingPanel.getStep(), playerSettingPanel.isSequenceOpen());
 
         GameFrame gameFrame = new GameFrame();
         FrameBackButton gameBack = new FrameBackButton(this, gameFrame);

@@ -21,7 +21,7 @@ public class CustomizeDifPanel extends JPanel {
 
     CustomizeDifPanel() {
         setLayout(null);
-        setSize(300, 400);
+        setSize(225, 400);
 
         JLabel rowLabel = new JLabel("Row(9-30):");
         rowLabel.setSize(100, 20);
@@ -76,7 +76,7 @@ public class CustomizeDifPanel extends JPanel {
 
     public boolean isFieldDataAvailable(JTextField field, int boundMax, int boundMin) {
         String text = field.getText();
-        if (!text.matches("\\d{1,2}")) return false;
+        if (!text.matches("\\d{1,3}")) return false;
         int num = Integer.parseInt(text);
         return num <= boundMax && num >= boundMin;
     }

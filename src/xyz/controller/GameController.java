@@ -13,13 +13,18 @@ public class GameController implements GameListener {
     private int currentPlayer;
     private boolean cheatMode;//false:关闭， true:开启
     private byte gameState;//0:还没开始；1:正在进行；2:已结束; 在GameController.judgeWinner()中用到
-    private byte steps;//一个player可以走的步数
+    private final byte steps;//一个player可以走的步数
     private byte stepCnt;//给steps计数
+    private final byte playerCount;
+    private final boolean sequenceOpen;
 
-    public GameController(BoardComponent component, Board board, ScoreBoard scoreBoard) {
+    public GameController(BoardComponent component, Board board, ScoreBoard scoreBoard, byte playerCount, byte steps, boolean sequenceOpen) {
         this.view1 = component;
         this.view2 = scoreBoard;
         this.model = board;
+        this.steps = steps;
+        this.sequenceOpen = sequenceOpen;
+        this.playerCount = playerCount;
         view1.registerListener(this);
         initialGameState();
     }
@@ -30,7 +35,6 @@ public class GameController implements GameListener {
         int num;
         BoardLocation location;
         gameState = 0;
-        steps = 1;//TODO: 自定义一共走的步数
         stepCnt = 0;
         for (int row = 0; row < model.getRow(); row++) {
             for (int col = 0; col < model.getColumn(); col++) {

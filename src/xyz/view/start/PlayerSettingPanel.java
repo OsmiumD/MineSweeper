@@ -1,18 +1,74 @@
 package xyz.view.start;
 
 import javax.swing.*;
+import java.awt.*;
+import java.io.FileInputStream;
 
 public class PlayerSettingPanel extends JPanel {
-    JComboBox<Integer> playerCount;
-    JComboBox<Integer> stepCount;
-    PlayerSettingPanel(){
-        setSize(200,400);
-        setLocation(200,0);
+    JComboBox<Byte> playerCount;
+    JComboBox<Byte> stepCount;
+    JCheckBox sequenceOpen;
+    static Font font;
 
-        JComboBox<Integer> playerCount = new JComboBox<>();
-        for (int i = 2; i <= 4; i++) {
+    static {
+        try {
+            font = Font.createFont(Font.TRUETYPE_FONT,
+                    new FileInputStream("src/xyz/view/Font/FrozenNeutra.otf"));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        font = font.deriveFont(Font.PLAIN, 16);
+    }
+
+    PlayerSettingPanel() {
+        setSize(200, 400);
+        setLocation(200, 0);
+        setLayout(null);
+
+        JLabel labelPlayerCount = new JLabel("PlayerCount");
+        labelPlayerCount.setSize(100, 20);
+        labelPlayerCount.setFont(font);
+        labelPlayerCount.setLocation(50, 30);
+        add(labelPlayerCount);
+
+        playerCount = new JComboBox<>();
+        playerCount.setSize(40, 20);
+        playerCount.setLocation(80, 50);
+        for (byte i = 2; i <= 4; i++) {
             playerCount.addItem(i);
         }
+        add(playerCount);
 
+        JLabel labelStep = new JLabel("Step");
+        labelStep.setSize(60, 20);
+        labelStep.setFont(font);
+        labelStep.setLocation(70, 80);
+        add(labelStep);
+
+        stepCount = new JComboBox<>();
+        stepCount.setSize(40, 20);
+        stepCount.setLocation(80, 100);
+        for (byte i = 1; i <= 5; i++) {
+            stepCount.addItem(i);
+        }
+        add(stepCount);
+
+        sequenceOpen = new JCheckBox("SequenceOpen");
+        sequenceOpen.setFont(font);
+        sequenceOpen.setSize(130, 20);
+        sequenceOpen.setLocation(35, 130);
+        add(sequenceOpen);
+    }
+
+    public byte getPlayerCount() {
+        return (Byte) playerCount.getSelectedItem();
+    }
+
+    public byte getStep() {
+        return (Byte) stepCount.getSelectedItem();
+    }
+
+    public boolean isSequenceOpen() {
+        return sequenceOpen.isSelected();
     }
 }
