@@ -5,7 +5,7 @@ public class Square {
     private boolean isOpened;//目前，opened意为“已结算”，无论一个格子是被左击还是右击，都会setOpened(true)
     private boolean isFlag;
     private boolean hasLandMine;
-    private byte numberOfLandMine;
+    private int numberOfLandMine;
 
     public Square(BoardLocation location) {
         this.location = location;
@@ -28,7 +28,7 @@ public class Square {
         return hasLandMine;
     }
 
-    public byte getNumberOfLandMine () {
+    public int getNumberOfLandMine () {
         return numberOfLandMine;
     }
 
@@ -59,6 +59,11 @@ public class Square {
         return numberOfLandMine;
         // TODO: You should implement the method to give the number of the item stored in the grid
     }
+
+    public void setNumberOfLandMine(int numberOfLandMine) {
+        this.numberOfLandMine = numberOfLandMine;
+    }
+
 
 
     /*

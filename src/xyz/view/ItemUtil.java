@@ -18,6 +18,8 @@ public class ItemUtil {
 
     public static Image genItem(int i) {
         switch (i) {
+            case 11:
+                return flag;
             case 10:
                 return mask;
             case 9:

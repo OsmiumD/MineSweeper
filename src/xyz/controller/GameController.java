@@ -14,7 +14,7 @@ public class GameController implements GameListener {
     private boolean cheatMode;//false:关闭， true:开启
     private byte gameState;//0:还没开始；1:正在进行；2:已结束; 在GameController.judgeWinner()中用到
     private final byte steps;//一个player可以走的步数
-    private byte stepCnt;//给steps计数
+    private byte stepCount;//给steps计数
     private final byte playerCount;
     private final boolean sequenceOpen;
 
@@ -35,7 +35,7 @@ public class GameController implements GameListener {
         int num;
         BoardLocation location;
         gameState = 0;
-        stepCnt = 0;
+        stepCount = 0;
         for (int row = 0; row < model.getRow(); row++) {
             for (int col = 0; col < model.getColumn(); col++) {
                 location = new BoardLocation(row, col);
@@ -48,9 +48,9 @@ public class GameController implements GameListener {
     }
 
     public void nextPlayer() {
-        stepCnt++;
-        if (stepCnt == steps) {
-            stepCnt = 0;
+        stepCount++;
+        if (stepCount == steps) {
+            stepCount = 0;
             currentPlayer = (currentPlayer == 0) ? 1 : 0;
         }
     }
@@ -157,6 +157,9 @@ public class GameController implements GameListener {
                         view1.setItemAt(model.getGrid()[i][j].getLocation(), model.getGrid()[i][j].getNum());
                         // 这句话的意思参照了initialGameState()
                     }
+                    if (model.getGrid()[i][j].isFlag()) {
+                        view1.setItemAt(model.getGrid()[i][j].getLocation(), 11);
+                    }
                 }
             }
         }
@@ -226,6 +229,10 @@ public class GameController implements GameListener {
         }
     }
 
+    public int remainMineNum() {
+        return model.getRemainderMineNum();
+    }
+
     public int getGameState() {
         return gameState;
     }
@@ -238,8 +245,8 @@ public class GameController implements GameListener {
         return steps;
     }
 
-    public byte getStepCnt() {
-        return stepCnt;
+    public byte getStepCount() {
+        return stepCount;
     }
 
     public byte getPlayerCount() {

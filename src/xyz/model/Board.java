@@ -34,7 +34,6 @@ public class Board {
                 // 初始化参数，所以在Square的Constructor中不用写初始化
             }
         }
-        //grid[0][0].setNumberOfLandMine((byte) 3);
     }
 
     /**
@@ -63,6 +62,9 @@ public class Board {
 
     public void openGrid(BoardLocation location) {
         getGridAt(location).setOpened(true);
+        if (getGridAt(location).hasLandMine()) {
+            remainderMineNum--;
+        }
     }
 
     public void flagGrid (BoardLocation location) {
