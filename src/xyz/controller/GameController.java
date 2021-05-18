@@ -37,7 +37,8 @@ public class GameController implements GameListener {
                 num = model.getNumAt(location);
                 view1.setItemAt(location, num);
             }
-        }
+         }
+
         view1.repaint();
     }
 
@@ -51,10 +52,19 @@ public class GameController implements GameListener {
 
     @Override
     public void onPlayerLeftClick(BoardLocation location, SquareComponent component) {
+        if (gameState == 0) {
+            model.randomLandMine(location);
+            model.iniItem();
+            gameState = 1;
+        }
+        if (!model.isValidClick(location, 1)) {
+            System.out.print("\nInvalid Click!");
+            return;
+        }
         printMessage(location, "left");
         if (gameState == 0) {
-            gameState = 1;
             //TODO: 首发不触雷
+            gameState = 1;
         }
 
         // demo里的，先不删
@@ -68,14 +78,14 @@ public class GameController implements GameListener {
         */
 
         Square clickedGrid = model.getGridAt(location);
-        clickedGrid.setOpened(true);
+        model.openGrid(location);
 
         if (clickedGrid.hasLandMine()) {
             view2.lose(currentPlayer);
         }
         view1.setItemAt(location, clickedGrid.getNum());
         repaintAll();
-        if (model.isAllGridOpened()) {
+        if (model.isAllGridClicked()) {
             gameState = 2;//全部open，游戏结束
         }
         judgeWinner();
@@ -84,14 +94,18 @@ public class GameController implements GameListener {
 
     @Override
     public void onPlayerRightClick(BoardLocation location, SquareComponent component) {
+        if (gameState == 0 || !model.isValidClick(location, 3)) {
+            System.out.print("\nInvalid Click!");
+            return;
+        }
         printMessage(location, "right");
 
         Square clickedGrid = model.getGridAt(location);
-        clickedGrid.setOpened(true);
+        model.openGrid(location);
 
         if (clickedGrid.hasLandMine()) {
             // 有雷，则插旗；加分
-            clickedGrid.setFlag(true);
+            model.flagGrid(location);
             view2.goal(currentPlayer);
         }else {
             // 没雷，则正常翻开；扣分
@@ -100,7 +114,7 @@ public class GameController implements GameListener {
         }
         view1.setItemAt(location, clickedGrid.getNum());
         repaintAll();
-        if (model.isAllGridOpened()) {
+        if (model.isAllGridClicked()) {
             gameState = 2;//全部open，游戏结束
         }
         judgeWinner();
@@ -111,7 +125,11 @@ public class GameController implements GameListener {
     // 开作弊模式，显示所有（实际做的是：未open的）格子的数字
     // 关作弊模式，取消未open格子的数字
     public void onPlayerMidClick(BoardLocation location, SquareComponent component) {
-        printMessage(location, "middle");
+        if (gameState == 0 || !model.isValidClick(location, 2)) {
+            System.out.print("\nInvalid Click!");
+            return;
+        }
+        //printMessage(location, "middle");
         if (!cheatMode) {
             cheatMode = true;
             System.out.print("\nCheating Mode: On.");
@@ -196,6 +214,7 @@ public class GameController implements GameListener {
         if (winnerIsDetermined) {
             System.out.print("\nGame Ended.\n");
             //TODO:取消（所有？至少返回按键不要）Listener注册；显示输赢
+            //view1.unregisterListener(this);
         }
     }
 }

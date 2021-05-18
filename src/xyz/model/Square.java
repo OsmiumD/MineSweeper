@@ -2,7 +2,7 @@ package xyz.model;
 
 public class Square {
     private BoardLocation location;
-    private boolean isOpened;
+    private boolean isOpened;//目前，opened意为“已结算”，无论一个格子是被左击还是右击，都会setOpened(true)
     private boolean isFlag;
     private boolean hasLandMine;
     private byte numberOfLandMine;
@@ -53,8 +53,9 @@ public class Square {
     }
 
     public int getNum () {
-        if (hasLandMine) return 9;//land mine
+        if (isFlag) return 11;//flag，方便写GUI
         if (!isOpened) return 10;//closed
+        if (hasLandMine) return 9;//land mine
         return numberOfLandMine;
         // TODO: You should implement the method to give the number of the item stored in the grid
     }

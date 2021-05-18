@@ -15,7 +15,7 @@ public class Board {
         remainderMineNum = mineNum;
 
         iniGrid();
-        iniItem();
+        //iniItem();
     }
 
     public void iniGrid () {
@@ -28,7 +28,6 @@ public class Board {
 
     public void iniItem () {
         // TODO: This is only a demo implementation.
-        //TODO: 调用randomLandMine()，不过此时不能保证不首发触雷。
         for (int i = 0; i < row; i++) {
             for (int j = 0; j < column; j++) {
                 grid[i][j].setNumberOfLandMine(calculateNum(i,j));
@@ -39,7 +38,7 @@ public class Board {
     }
 
     /**
-     * 计算grid[i][j]附近雷的数量
+     * 计算grid[i][j]附近雷的数量，算上自己
      * @return 雷的数量
      */
     public byte calculateNum (int i, int j) {
@@ -77,8 +76,9 @@ public class Board {
         // TODO: You should implement a method here to check whether it is a valid action
         switch (clickType) {
             case 1:
-            case 2:
-                if (!getGridAt(location).isOpened() && !getGridAt(location).isFlag()) return true;
+            case 3:
+                //if (!getGridAt(location).isOpened() && !getGridAt(location).isFlag()) return true;
+                if (!getGridAt(location).isOpened()) return true;
                 else return false;
             default:
                 return true;
@@ -87,11 +87,11 @@ public class Board {
 
     /**
      * 随机生成雷
-     * 已完成：3.2 避免首发碰雷（应在第一次点击后调用此方法）
-     * TODO: 3.1 避免过度密集
-     * TODO: 3.3 透视雷的位置
+     * 已完成：3.1 避免过度密集
+     * 已完成：3.2 避免首发碰雷（在第一次点击后调用此方法）
+     * 已完成：3.3 透视雷的位置
      */
-    private void randomLandMine() {
+    public void randomLandMine(BoardLocation location) {
         //mineNum = 0;
         for (int i = 0; i < mineNum; i++) {
             //i仅起到计数的作用，即保证生成mineNum个雷
@@ -100,19 +100,40 @@ public class Board {
             /* 第二个判断条件：第一次点击不爆雷
                应在第一次点击后调用此方法
              */
-            if (getGridAt(new BoardLocation(randomRow, randomCol)).hasLandMine() ||
-                    getGridAt(new BoardLocation(randomRow, randomCol)).isOpened()) {
+            if (grid[randomRow][randomCol].hasLandMine() ||
+                    grid[randomRow][randomCol].isOpened() ||
+                    grid[randomRow][randomCol].isFlag() ||
+                    (location.getRow() == randomRow && location.getColumn() == randomCol)) {
                 i--;
             }else {
-                getGridAt(new BoardLocation(randomRow, randomCol)).setHasLandMine(true);
+                grid[randomRow][randomCol].setHasLandMine(true);
+                if (!isValidLandMine(randomRow, randomCol)) {
+                    grid[randomRow][randomCol].setHasLandMine(false);
+                    i--;
+                }
             }
         }
     }
 
-    public boolean isAllGridOpened() {
+    private boolean isValidLandMine(int i, int j) {
+        for (int m = i-1; m <= i+1 && 0 <= m && m < row; m++) {
+            for (int n = j-1; n <= j+1 && 0 <= n && n <= column; n++) {
+                if ((m == 0 || m == row-1) && (n == 0 || n == column-1)) {
+                    if (calculateNum(m, n) == 4) return false;//角上
+                }else if (m == 0 || m == row-1 || n == 0 || n == column-1) {
+                    if (calculateNum(m, n) == 6) return false;//边上
+                }else {
+                    if (calculateNum(m, n) == 9) return false;//中间
+                }
+            }
+        }
+        return true;
+    }
+
+    public boolean isAllGridClicked() {
         for (int i = 0; i < row; i++) {
             for (int j = 0; j < column; j++) {
-                if (!grid[i][j].isOpened()) return false;
+                if (!grid[i][j].isOpened() && !grid[i][j].isFlag()) return false;
             }
         }
         return true;
