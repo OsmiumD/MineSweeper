@@ -225,4 +225,28 @@ public class GameController implements GameListener {
             //view1.unregisterListener(this);
         }
     }
+
+    public int getGameState() {
+        return gameState;
+    }
+
+    public int getCurrentPlayer() {
+        return currentPlayer;
+    }
+
+    public byte getSteps() {
+        return steps;
+    }
+
+    public byte getStepCnt() {
+        return stepCnt;
+    }
+
+    public byte getPlayerCount() {
+        return playerCount;
+    }
+
+    public boolean isSequenceOpen() {
+        return sequenceOpen;
+    }
 }
