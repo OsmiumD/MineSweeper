@@ -61,13 +61,6 @@ public class Square implements Serializable {
         return numberOfLandMine;
         // TODO: You should implement the method to give the number of the item stored in the grid
     }
-
-    public void setNumberOfLandMine(int numberOfLandMine) {
-        this.numberOfLandMine = numberOfLandMine;
-    }
-
-
-
     /*
     Each grid has five states: the first two include a grid that is not open or is marked;
     The last three are lattice is opened, if there are no mines around, do not show;

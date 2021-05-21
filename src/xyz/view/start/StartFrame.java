@@ -9,6 +9,7 @@ import xyz.view.GameFrame;
 import xyz.view.ScoreBoard;
 
 import javax.swing.*;
+import java.awt.*;
 import java.io.*;
 import java.util.ArrayList;
 

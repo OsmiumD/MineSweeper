@@ -2,7 +2,7 @@
 package xyz.view.start;
 
 import javax.swing.*;
-public class                    FrameBackButton extends JButton{
+public class FrameBackButton extends JButton{
     FrameBackButton(JFrame view1, JFrame view2){
         setText("Back");
         addActionListener(e -> {

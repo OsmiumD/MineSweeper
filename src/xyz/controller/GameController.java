@@ -250,7 +250,6 @@ public class GameController implements GameListener {
                 if (i == 0 && j == 0) continue;
                 sequenceOpen(new BoardLocation(location.getRow() + i, location.getColumn() + j));
             }
-
         }
     }
 
