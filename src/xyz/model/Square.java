@@ -3,7 +3,7 @@ package xyz.model;
 import java.io.Serializable;
 
 public class Square implements Serializable {
-    private BoardLocation location;
+    private final BoardLocation location;
     private boolean isOpened;//目前，opened意为“已结算”，无论一个格子是被左击还是右击，都会setOpened(true)
     private boolean isFlag;
     private boolean hasLandMine;

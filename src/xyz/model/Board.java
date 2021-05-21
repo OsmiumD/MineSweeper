@@ -1,7 +1,7 @@
 package xyz.model;
 
+
 import java.io.Serializable;
-import java.time.LocalDateTime;
 
 public class Board implements Serializable {
     private Square[][] grid;
@@ -164,5 +164,9 @@ public class Board implements Serializable {
 
     public Square[][] getGrid() {
         return grid;
+    }
+
+    public int getMineNum() {
+        return mineNum;
     }
 }

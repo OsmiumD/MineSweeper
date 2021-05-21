@@ -1,12 +1,13 @@
 package xyz.view;
 
+import xyz.GameUtil;
+
 import javax.swing.*;
 import java.awt.*;
 import java.io.FileInputStream;
 
 public class SquareComponent extends JPanel {
     //一个方块
-    private static Image grid = Toolkit.getDefaultToolkit().getImage("src/xyz/view/pic/emptygrid.png");
     private int size;
     private static Font font;
     private int num;
@@ -39,7 +40,7 @@ public class SquareComponent extends JPanel {
 
     private void painting (Graphics g) {
         int spacing = (int) (getWidth() * 0.05);
-        Image image = ItemUtil.genItem(num);
+        Image image = GameUtil.genItem(num);
         if (image != null) {
             g.drawImage(image, spacing, spacing, getWidth() - 2 * spacing, getHeight() - 2 * spacing, this);
         }

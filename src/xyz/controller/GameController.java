@@ -2,6 +2,7 @@ package xyz.controller;
 
 //import org.jetbrains.annotations.NotNull;
 
+import xyz.GameUtil;
 import xyz.listener.GameListener;
 import xyz.model.*;
 import xyz.view.*;
@@ -9,40 +10,37 @@ import xyz.view.*;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.ObjectOutputStream;
-import java.io.Serializable;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 
-public class GameController implements GameListener, Serializable {
+public class GameController implements GameListener {
     private final BoardComponent view1;
     private final ScoreBoard view2;
     private final Board model;
-    private int currentPlayer;
+    private byte currentPlayer;
     private boolean cheatMode;//false:关闭， true:开启
     private byte gameState;//0:还没开始；1:正在进行；2:已结束; 在GameController.judgeWinner()中用到
-    private final byte steps;//一个player可以走的步数
-    private byte stepCount;//给steps计数
+    private final byte stepCount;//一个player可以走的步数
+    private byte currentStep;//给steps计数
     private final byte playerCount;
     private final boolean sequenceOpen;
 
-    public GameController(BoardComponent component, Board board, ScoreBoard scoreBoard, byte playerCount, byte steps, boolean sequenceOpen) {
+    public GameController(BoardComponent component, Board board, ScoreBoard scoreBoard, GameControllerData data) {
         this.view1 = component;
         this.view2 = scoreBoard;
         this.model = board;
-        this.steps = steps;
-        this.sequenceOpen = sequenceOpen;
-        this.playerCount = playerCount;
+        this.stepCount = data.getStepCount();
+        this.sequenceOpen = data.isSequenceOpen();
+        this.playerCount = data.getPlayerCount();
+        this.currentPlayer = data.getCurrentPlayer();
+        this.currentStep = data.getCurrentStep();
+        this.gameState = data.getGameState();
         view1.registerListener(this);
         initialGameState();
     }
 
     public void initialGameState() {
-        cheatMode = false;
-        currentPlayer = 0;
+        cheatMode=false;
         int num;
         BoardLocation location;
-        gameState = 0;
-        stepCount = 0;
         for (int row = 0; row < model.getRow(); row++) {
             for (int col = 0; col < model.getColumn(); col++) {
                 location = new BoardLocation(row, col);
@@ -55,10 +53,10 @@ public class GameController implements GameListener, Serializable {
     }
 
     public void nextPlayer() {
-        stepCount++;
-        if (stepCount == steps) {
-            stepCount = 0;
-            currentPlayer = (currentPlayer == 0) ? 1 : 0;
+        currentStep++;
+        if (currentStep == stepCount) {
+            currentStep = 0;
+            currentPlayer = (currentPlayer == (byte) 0) ? (byte) 1 : (byte) 0;
         }
     }
 
@@ -70,7 +68,7 @@ public class GameController implements GameListener, Serializable {
             gameState = 1;
         }
         if (!model.isValidClick(location, 1)) {
-            System.out.print("\nInvalid Click!");
+            System.out.println("Invalid Click!\n");
             return;
         }
         printMessage(location, "left");
@@ -110,7 +108,7 @@ public class GameController implements GameListener, Serializable {
     @Override
     public void onPlayerRightClick(BoardLocation location, SquareComponent component) {
         if (gameState == 0 || !model.isValidClick(location, 3)) {
-            System.out.print("\nInvalid Click!");
+            System.out.println("Invalid Click!");
             return;
         }
         printMessage(location, "right");
@@ -141,13 +139,13 @@ public class GameController implements GameListener, Serializable {
     // 关作弊模式，取消未open格子的数字
     public void onPlayerMidClick(BoardLocation location, SquareComponent component) {
         if (gameState == 0 || !model.isValidClick(location, 2)) {
-            System.out.print("\nInvalid Click!");
+            System.out.println("Invalid Click!");
             return;
         }
         //printMessage(location, "middle");
         if (!cheatMode) {
             cheatMode = true;
-            System.out.print("\nCheating Mode: On.");
+            System.out.println("Cheating Mode: On.");
             for (int i = 0; i < model.getRow(); i++) {
                 for (int j = 0; j < model.getColumn(); j++) {
                     if (!model.getGrid()[i][j].isOpened()) {
@@ -160,7 +158,7 @@ public class GameController implements GameListener, Serializable {
             }
         } else {
             cheatMode = false;
-            System.out.print("\nCheating Mode: Off.");
+            System.out.println("Cheating Mode: Off.");
             for (int i = 0; i < model.getRow(); i++) {
                 for (int j = 0; j < model.getColumn(); j++) {
                     if (!model.getGrid()[i][j].isOpened()) {
@@ -179,7 +177,7 @@ public class GameController implements GameListener, Serializable {
     private void printMessage(BoardLocation location, String str) {
         int row_in_message = location.getRow();
         int column_in_message = location.getColumn();
-        String format = "\nOn Player %d %s click at (%d, %d), ";
+        String format = "On Player %d %s click at (%d, %d), \n";
         System.out.printf(format, currentPlayer, str, row_in_message + 1, column_in_message + 1);
     }
 
@@ -211,7 +209,7 @@ public class GameController implements GameListener, Serializable {
                 //winner: player_1
             } else {
                 winnerIsDetermined = true;
-                System.out.print("\nTie Game! No Winner!");
+                System.out.println("Tie Game! No Winner!");
                 //平局
             }
         }
@@ -231,9 +229,9 @@ public class GameController implements GameListener, Serializable {
             winnerIsDetermined = true;
             //winner: player_1
         }
-        System.out.printf("\njudge winner, gameState is %d", gameState);
+        System.out.printf("judge winner, gameState is %d\n", gameState);
         if (winnerIsDetermined) {
-            System.out.print("\nGame Ended.\n");
+            System.out.println("Game Ended.\n");
             //TODO:取消（所有？至少返回按键不要）（返回键的Listener不是这样子的，可以取消）Listener注册；显示输赢
             //view1.unregisterListener(this);
         }
@@ -245,6 +243,7 @@ public class GameController implements GameListener, Serializable {
         if (grid.isOpened()) return;
         model.openGrid(location);
         view1.setItemAt(location, grid.getNum());
+        view1.repaint();
         if (grid.getNumberOfLandMine() != 0 || grid.hasLandMine()) return;
         for (int i = -1; i <= 1; i++) {
             for (int j = -1; j <= 1; j++) {
@@ -256,20 +255,17 @@ public class GameController implements GameListener, Serializable {
     }
 
     public void saveGame() {
-        File file = new File(System.getenv("APPDATA") + "\\MineSweeperJavaA\\" + currentTime() + ".msv");
-        ReadSave rs = new ReadSave(model, view2, this);
+        File file = new File(System.getenv("APPDATA") + "\\MineSweeperJavaA\\" + GameUtil.currentTime() + ".msv");
+        ReadSave rs = new ReadSave(model, this, view2);
         try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(file))) {
             oos.writeObject(rs);
         } catch (Exception e) {
             e.printStackTrace();
         }
+        GameUtil.showMessage("Message","Save Complete!");
     }
 
-    public static String currentTime() {
-        LocalDateTime time = LocalDateTime.now();
-        DateTimeFormatter fmt = DateTimeFormatter.ofPattern("yyyyMMdd-HHmmss");
-        return time.format(fmt);
+    public GameControllerData saveCurrentStatus() {
+        return new GameControllerData(gameState, currentStep, stepCount, currentPlayer, playerCount, sequenceOpen);
     }
-
-
 }

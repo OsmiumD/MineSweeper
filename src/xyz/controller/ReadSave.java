@@ -2,12 +2,11 @@ package xyz.controller;
 
 import xyz.model.*;
 import xyz.view.ScoreBoard;
+import xyz.view.start.StartFrame;
 
 import java.io.*;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 
-public class ReadSave implements Serializable{
+public class ReadSave implements Serializable {
     /*
      * 文件存储格式：
      * (gameState) (steps) (stepCnt) (sequenceOpen(0=false, 1=true))
@@ -17,25 +16,33 @@ public class ReadSave implements Serializable{
      * (grid[0][0].getNum()) ...
      */
 
-    Board board;
-    ScoreBoard scoreBoard;
-    GameController controller;
+    private final Board board;
+    private final int row, col;
+    private final int[][] score;
+    private final GameControllerData data;
 
-    public ReadSave(Board board, ScoreBoard scoreBoard, GameController controller) {
+    public ReadSave(Board board, GameController controller, ScoreBoard scoreBoard) {
         this.board = board;
-        this.scoreBoard = scoreBoard;
-        this.controller = controller;
+        row = board.getRow();
+        col = board.getColumn();
+        score = scoreBoard.getScoreBoard();
+        data = controller.saveCurrentStatus();
     }
 
-    public Board getBoard() {
-        return board;
+    public void print() {
+        for (int i = 0; i < col; i++) {
+            for (int j = 0; j < row; j++) {
+                if (board.getGrid()[j][i].hasLandMine()) System.out.print("9 ");
+                else System.out.print(board.getGrid()[j][i].getNumberOfLandMine() + " ");
+            }
+            System.out.println();
+        }
+        System.out.println();
     }
 
-    public GameController getController() {
-        return controller;
+    public void resumeGame(StartFrame startFrame) {
+        startFrame.initGame(row, col, board, score, data);
     }
 
-    public ScoreBoard getScoreBoard() {
-        return scoreBoard;
-    }
+
 }

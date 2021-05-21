@@ -1,8 +1,11 @@
-package xyz.view;
+package xyz;
 
+import javax.swing.*;
 import java.awt.*;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
-public class ItemUtil {
+public class GameUtil {
     private static final Image mask;
     private static final Image empty;
     private static final Image mine;
@@ -28,4 +31,21 @@ public class ItemUtil {
                 return empty;
         }
     }
+
+    public static String currentTime() {
+        LocalDateTime time = LocalDateTime.now();
+        DateTimeFormatter fmt = DateTimeFormatter.ofPattern("yyyyMMdd-HHmmss");
+        return time.format(fmt);
+    }
+
+    public static void showMessage(String title, String content) {
+        JFrame frame = new JFrame();
+        JLabel label = new JLabel(content);
+        frame.setLocationRelativeTo(null);
+        frame.setTitle(title);
+        frame.setLayout(new FlowLayout());
+        frame.add(label);
+        frame.setVisible(true);
+    }
 }
+

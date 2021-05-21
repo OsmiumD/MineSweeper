@@ -1,6 +1,7 @@
 package xyz.view.start;
 
 import xyz.controller.GameController;
+import xyz.controller.GameControllerData;
 import xyz.controller.ReadSave;
 import xyz.model.Board;
 import xyz.view.BoardComponent;
@@ -87,6 +88,7 @@ public class StartFrame extends JFrame {
             loadFrame.setVisible(true);
             loadFrame.addActionListener(e1 -> {
                 loadGame(loadFrame.getFile());
+                loadFrame.dispose();
             });
         });
     }
@@ -94,12 +96,7 @@ public class StartFrame extends JFrame {
     private void loadGame(File file) {
         try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(file))) {
             ReadSave rs = (ReadSave) ois.readObject();
-            Board board = rs.getBoard();
-            ScoreBoard scoreBoard = rs.getScoreBoard();
-            GameController controller = rs.getController();
-            BoardComponent boardComponent = initBoardComponent(board.getRow(), board.getColumn());
-            boardComponent.registerListener(controller);
-
+            rs.resumeGame(this);
         } catch (Exception ex) {
             ex.printStackTrace();
         }
@@ -129,18 +126,28 @@ public class StartFrame extends JFrame {
     }
 
     private void initGame(int row, int col, int mineNum) {
-        int width = 50, height = 50;
         BoardComponent boardComponent = initBoardComponent(row, col);
-        width += boardComponent.getWidth();
-        height += boardComponent.getHeight();
         Board board = initBoard(row, col, mineNum);
         ScoreBoard scoreBoard = new ScoreBoard(playerSettingPanel.getPlayerCount());
+        GameControllerData data = new GameControllerData((byte) 0, (byte) 0, playerSettingPanel.getStep(), (byte) 0, playerSettingPanel.getPlayerCount(), playerSettingPanel.isSequenceOpen());
+        initGame(boardComponent, board, data, scoreBoard);
+    }
+
+    public void initGame(int row, int col, Board board, int[][] score, GameControllerData data) {
+        BoardComponent boardComponent = initBoardComponent(row, col);
+        ScoreBoard scoreBoard = new ScoreBoard(data.getPlayerCount(), score);
+        initGame(boardComponent, board, data, scoreBoard);
+    }
+
+    private void initGame(BoardComponent boardComponent, Board board, GameControllerData data, ScoreBoard scoreBoard) {
+        int width = 50, height = 50;
+        width += boardComponent.getWidth();
+        height += boardComponent.getHeight();
         width += scoreBoard.getWidth();
         height = Math.max(scoreBoard.getHeight(), height);
         scoreBoard.setLocation(boardComponent.getWidth() - 20, 40);
-        GameController gameController =
-                new GameController(boardComponent, board, scoreBoard, playerSettingPanel.getPlayerCount(), playerSettingPanel.getStep(), playerSettingPanel.isSequenceOpen());
-
+        GameController gameController;
+        gameController = new GameController(boardComponent, board, scoreBoard, data);
         GameFrame gameFrame = new GameFrame();
         FrameBackButton gameBack = new FrameBackButton(this, gameFrame);
         gameBack.setSize(80, 20);

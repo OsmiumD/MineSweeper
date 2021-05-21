@@ -1,5 +1,7 @@
 package xyz.view.start;
 
+import xyz.GameUtil;
+
 import javax.swing.*;
 import java.awt.*;
 import java.io.FileInputStream;
@@ -60,14 +62,14 @@ public class CustomizeDifPanel extends JPanel {
     public boolean isDataAvailable() {
         if (!isFieldDataAvailable(rowField, 30, 9) ||
                 !isFieldDataAvailable(colField, 24, 9)) {
-            showMessage("Error", "Input not Available");
+            GameUtil.showMessage("Error", "Input not Available");
             return false;
         }
         col = Integer.parseInt(colField.getText());
         row = Integer.parseInt(rowField.getText());
         int grid = row * col;
         if(!isFieldDataAvailable(mineField,grid/2,1)){
-            showMessage("Error", "Input not Available");
+            GameUtil.showMessage("Error", "Input not Available");
             return false;
         }
         mineNum=Integer.parseInt(mineField.getText());
@@ -79,16 +81,6 @@ public class CustomizeDifPanel extends JPanel {
         if (!text.matches("\\d{1,3}")) return false;
         int num = Integer.parseInt(text);
         return num <= boundMax && num >= boundMin;
-    }
-
-    private void showMessage(String title, String content) {
-        JFrame frame = new JFrame();
-        JLabel label = new JLabel(content);
-        frame.setLocationRelativeTo(null);
-        frame.setTitle(title);
-        frame.setLayout(new FlowLayout());
-        frame.add(label);
-        frame.setVisible(true);
     }
 
     public int getRow() {

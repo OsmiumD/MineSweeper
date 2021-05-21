@@ -17,7 +17,7 @@ public class BoardComponent extends JComponent {
     private final int col;
     private final int gridSize;
 
-    public BoardComponent (int row, int col, int rowLength, int colLength) {
+    public BoardComponent(int row, int col, int rowLength, int colLength) {
         enableEvents(MouseEvent.MOUSE_EVENT_MASK);//可以监听鼠标事件
         setLayout(null);
         setSize(rowLength, colLength);
@@ -29,7 +29,7 @@ public class BoardComponent extends JComponent {
     }
 
     // 通过SquareComponent.location对方块的位置信息读取、更改
-    private void initialGridComponent () {
+    private void initialGridComponent() {
         for (int i = 0; i < row; i++) {
             for (int j = 0; j < col; j++) {
                 gridComponents[i][j] = new SquareComponent(gridSize);
@@ -47,12 +47,7 @@ public class BoardComponent extends JComponent {
         return new BoardLocation(x / gridSize, y / gridSize);
     }
 
-    private void removeItemAt (BoardLocation location) {
-        getGridAt(location).removeAll();
-        getGridAt(location).revalidate();
-    }
-
-    public void setItemAt (BoardLocation location, int num) {
+    public void setItemAt(BoardLocation location, int num) {
         getGridAt(location).setItem(num);
     }
 
@@ -63,7 +58,6 @@ public class BoardComponent extends JComponent {
         if (e.getID() != MouseEvent.MOUSE_PRESSED) return;
         switch (e.getButton()) {
             case MouseEvent.BUTTON1: {
-                // TODO: 2021/4/13 left mouse button
                 JComponent clickedComponent = (JComponent) getComponentAt(e.getX(), e.getY());
                 //get被点击的component
                 BoardLocation location = getLocationByPosition(e.getX(), e.getY());
@@ -74,7 +68,6 @@ public class BoardComponent extends JComponent {
                 break;
             }
             case MouseEvent.BUTTON2: {
-                // TODO: 2021/4/13 middle mouse button
                 JComponent clickedComponent = (JComponent) getComponentAt(e.getX(), e.getY());
                 BoardLocation location = getLocationByPosition(e.getX(), e.getY());
                 for (GameListener listener : listenerList) {
@@ -83,7 +76,6 @@ public class BoardComponent extends JComponent {
                 break;
             }
             case MouseEvent.BUTTON3: {
-                // TODO: 2021/4/13 right mouse button
                 JComponent clickedComponent = (JComponent) getComponentAt(e.getX(), e.getY());
                 BoardLocation location = getLocationByPosition(e.getX(), e.getY());
                 for (GameListener listener : listenerList) {
