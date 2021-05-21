@@ -4,6 +4,7 @@ import xyz.controller.GameController;
 import xyz.controller.GameControllerData;
 import xyz.controller.ReadSave;
 import xyz.model.Board;
+import xyz.model.Player;
 import xyz.view.BoardComponent;
 import xyz.view.GameFrame;
 import xyz.view.ScoreBoard;
@@ -134,9 +135,9 @@ public class StartFrame extends JFrame {
         initGame(boardComponent, board, data, scoreBoard);
     }
 
-    public void initGame(int row, int col, Board board, int[][] score, GameControllerData data) {
+    public void initGame(int row, int col, Board board, Player[] players, GameControllerData data) {
         BoardComponent boardComponent = initBoardComponent(row, col);
-        ScoreBoard scoreBoard = new ScoreBoard(data.getPlayerCount(), score);
+        ScoreBoard scoreBoard = new ScoreBoard(data.getPlayerCount(), players);
         initGame(boardComponent, board, data, scoreBoard);
     }
 

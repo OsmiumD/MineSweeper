@@ -10,12 +10,16 @@ import xyz.view.*;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.ObjectOutputStream;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 public class GameController implements GameListener {
     private final BoardComponent view1;
     private final ScoreBoard view2;
     private final Board model;
-    private byte currentPlayer;
+    private byte currentPlayerId;
     private boolean cheatMode;//false:关闭， true:开启
     private byte gameState;//0:还没开始；1:正在进行；2:已结束; 在GameController.judgeWinner()中用到
     private final byte stepCount;//一个player可以走的步数
@@ -30,7 +34,7 @@ public class GameController implements GameListener {
         this.stepCount = data.getStepCount();
         this.sequenceOpen = data.isSequenceOpen();
         this.playerCount = data.getPlayerCount();
-        this.currentPlayer = data.getCurrentPlayer();
+        this.currentPlayerId = data.getCurrentPlayerId();
         this.currentStep = data.getCurrentStep();
         this.gameState = data.getGameState();
         view1.registerListener(this);
@@ -56,7 +60,8 @@ public class GameController implements GameListener {
         currentStep++;
         if (currentStep == stepCount) {
             currentStep = 0;
-            currentPlayer = (currentPlayer == (byte) 0) ? (byte) 1 : (byte) 0;
+            currentPlayerId = (byte) ((currentPlayerId + 1) % playerCount);//id从0开始
+            //currentPlayerId = (currentPlayerId == (byte) 0) ? (byte) 1 : (byte) 0;
         }
     }
 
@@ -89,7 +94,7 @@ public class GameController implements GameListener {
         Square clickedGrid = model.getGridAt(location);
 
         if (clickedGrid.hasLandMine()) {
-            view2.lose(currentPlayer);
+            view2.lose(currentPlayerId);
         }
         if (sequenceOpen) {
             sequenceOpen(location);
@@ -119,10 +124,10 @@ public class GameController implements GameListener {
         if (clickedGrid.hasLandMine()) {
             // 有雷，则插旗；加分
             model.flagGrid(location);
-            view2.goal(currentPlayer);
+            view2.goal(currentPlayerId);
         } else {
-            // 没雷，则正常翻开；扣分
-            view2.lose(currentPlayer);
+            // 没雷，则正常翻开；失误
+            view2.turnover(currentPlayerId);
             // TODO: project描述2.2中要在这里”提示：标记错误“
         }
         view1.setItemAt(location, clickedGrid.getNum());
@@ -178,7 +183,7 @@ public class GameController implements GameListener {
         int row_in_message = location.getRow();
         int column_in_message = location.getColumn();
         String format = "On Player %d %s click at (%d, %d), \n";
-        System.out.printf(format, currentPlayer, str, row_in_message + 1, column_in_message + 1);
+        System.out.printf(format, currentPlayerId, str, row_in_message + 1, column_in_message + 1);
     }
 
     private void repaintAll() {
@@ -193,7 +198,40 @@ public class GameController implements GameListener {
      */
     private void judgeWinner() {
         boolean winnerIsDetermined = false;
+        SortedSet<Player> playersSortedSet = new TreeSet<>(Arrays.asList(view2.getPlayers()));
+
         //以下：一般判断（所有的格子都open）
+        if (gameState == (byte) 2) {
+            winnerIsDetermined = true;
+            ArrayList<Player> winners = new ArrayList<>();
+            Player topPlayer = playersSortedSet.first();
+            for (Player player: playersSortedSet) {
+                if (topPlayer.compareTo(player) == 0) {
+                    winners.add(player);
+                } else break;
+            }
+            if (winners.size() == playerCount) {
+                System.out.println("Tie Game! No Winner!");
+            } else {
+                /*
+                StringBuilder winnerMessage = new StringBuilder();
+                winnerMessage.append("WINNER(s): ");
+                for (Player player: winners) {
+                    winnerMessage.append(player).append(", ");
+                }
+                winnerMessage.delete(winnerMessage.capacity()-2, winnerMessage.capacity());
+                winnerMessage.append("\n");
+                System.out.println(winnerMessage);
+                 *///麻了
+                if (winners.size() == 1) System.out.print("WINNER: ");
+                else System.out.print("WINNERs: ");
+                for (Player player: winners) {
+                    System.out.print(player);
+                }
+                System.out.println();
+            }
+        }
+        /*
         if (gameState == 2) {
             if (view2.getScoreBoard()[0][0] > view2.getScoreBoard()[0][1]) {
                 winnerIsDetermined = true;
@@ -213,27 +251,32 @@ public class GameController implements GameListener {
                 //平局
             }
         }
+         */
+
         //以下：提前结束
-        if (view2.getScoreBoard()[0][0] - view2.getScoreBoard()[0][1] > model.getRemainderMineNum()) {
-            winnerIsDetermined = true;
-            //winner: player_0
-        } else if (view2.getScoreBoard()[0][0] - view2.getScoreBoard()[0][1] == model.getRemainderMineNum() &&
-                view2.getScoreBoard()[1][0] < view2.getScoreBoard()[1][1]) {
-            winnerIsDetermined = true;
-            //winner: player_0
-        } else if (view2.getScoreBoard()[0][1] - view2.getScoreBoard()[0][0] > model.getRemainderMineNum()) {
-            winnerIsDetermined = true;
-            //winner: player_1
-        } else if (view2.getScoreBoard()[0][1] - view2.getScoreBoard()[0][0] == model.getRemainderMineNum() &&
-                view2.getScoreBoard()[1][1] < view2.getScoreBoard()[1][0]) {
-            winnerIsDetermined = true;
-            //winner: player_1
+        else {
+            Player p1 = playersSortedSet.first();
+            Player p2 = p1;
+            boolean tag = true;
+            for (Player p:
+                 playersSortedSet) {
+                p2 = p;
+                if (tag) tag = false;
+                else break;
+            }
+            if (p1.getScoreCnt() - p2.getScoreCnt() > model.getRemainderMineNum()) {
+                winnerIsDetermined = true;
+                System.out.printf("WINNER: %s\n", p1.toString());
+            }
         }
+
         System.out.printf("judge winner, gameState is %d\n", gameState);
         if (winnerIsDetermined) {
-            System.out.println("Game Ended.\n");
+            System.out.println("Game Ended.");
             //TODO:取消（所有？至少返回按键不要）（返回键的Listener不是这样子的，可以取消）Listener注册；显示输赢
             //view1.unregisterListener(this);
+        } else {
+            System.out.println("Game Continue.");
         }
     }
 
@@ -265,6 +308,6 @@ public class GameController implements GameListener {
     }
 
     public GameControllerData saveCurrentStatus() {
-        return new GameControllerData(gameState, currentStep, stepCount, currentPlayer, playerCount, sequenceOpen);
+        return new GameControllerData(gameState, currentStep, stepCount, currentPlayerId, playerCount, sequenceOpen);
     }
 }

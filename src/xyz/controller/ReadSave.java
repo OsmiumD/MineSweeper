@@ -15,17 +15,18 @@ public class ReadSave implements Serializable {
      * (row) (col) (mineNum) (remainedMineNum)//next row*col
      * (grid[0][0].getNum()) ...
      */
+    //可能要修改！
 
     private final Board board;
     private final int row, col;
-    private final int[][] score;
+    private final Player[] players;
     private final GameControllerData data;
 
     public ReadSave(Board board, GameController controller, ScoreBoard scoreBoard) {
         this.board = board;
         row = board.getRow();
         col = board.getColumn();
-        score = scoreBoard.getScoreBoard();
+        players = scoreBoard.getPlayers();
         data = controller.saveCurrentStatus();
     }
 
@@ -41,7 +42,7 @@ public class ReadSave implements Serializable {
     }
 
     public void resumeGame(StartFrame startFrame) {
-        startFrame.initGame(row, col, board, score, data);
+        startFrame.initGame(row, col, board, players, data);
     }
 
 
