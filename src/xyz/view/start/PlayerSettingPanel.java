@@ -1,8 +1,9 @@
 package xyz.view.start;
 
+import xyz.GameUtil;
+
 import javax.swing.*;
 import java.awt.*;
-import java.io.FileInputStream;
 
 public class PlayerSettingPanel extends JPanel {
     JComboBox<Byte> playerCount;
@@ -11,12 +12,7 @@ public class PlayerSettingPanel extends JPanel {
     static Font font;
 
     static {
-        try {
-            font = Font.createFont(Font.TRUETYPE_FONT,
-                    new FileInputStream("src/xyz/view/Font/FrozenNeutra.otf"));
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        font = GameUtil.getFont();
         font = font.deriveFont(Font.PLAIN, 16);
     }
 

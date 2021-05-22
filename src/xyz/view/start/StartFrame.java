@@ -1,5 +1,6 @@
 package xyz.view.start;
 
+import xyz.GameUtil;
 import xyz.controller.GameController;
 import xyz.controller.GameControllerData;
 import xyz.controller.ReadSave;
@@ -7,10 +8,10 @@ import xyz.model.Board;
 import xyz.model.Player;
 import xyz.view.BoardComponent;
 import xyz.view.GameFrame;
+import xyz.view.GameInfoComponent;
 import xyz.view.ScoreBoard;
 
 import javax.swing.*;
-import java.awt.*;
 import java.io.*;
 import java.util.ArrayList;
 
@@ -100,7 +101,7 @@ public class StartFrame extends JFrame {
             ReadSave rs = (ReadSave) ois.readObject();
             rs.resumeGame(this);
         } catch (Exception ex) {
-            ex.printStackTrace();
+            GameUtil.showMessage("Error", "Load Game Failed");
         }
     }
 
@@ -130,34 +131,47 @@ public class StartFrame extends JFrame {
     private void initGame(int row, int col, int mineNum) {
         BoardComponent boardComponent = initBoardComponent(row, col);
         Board board = initBoard(row, col, mineNum);
-        ScoreBoard scoreBoard = new ScoreBoard(playerSettingPanel.getPlayerCount());
-        GameControllerData data = new GameControllerData((byte) 0, (byte) 0, playerSettingPanel.getStep(), (byte) 0, playerSettingPanel.getPlayerCount(), playerSettingPanel.isSequenceOpen());
-        initGame(boardComponent, board, data, scoreBoard);
+        Player[] players=new Player[playerSettingPanel.getPlayerCount()];
+        for (byte i = 0; i < playerSettingPanel.getPlayerCount(); i++) {
+            players[i]=new Player(i);
+        }
+        GameControllerData data = new GameControllerData((byte) 0, (byte) 0, playerSettingPanel.getStep(), (byte) 0, playerSettingPanel.getPlayerCount(), playerSettingPanel.isSequenceOpen(), players);
+        initGame(boardComponent, board, data);
     }
 
-    public void initGame(int row, int col, Board board, Player[] players, GameControllerData data) {
+    public void initGame(int row, int col, Board board, GameControllerData data) {
         BoardComponent boardComponent = initBoardComponent(row, col);
-        ScoreBoard scoreBoard = new ScoreBoard(data.getPlayerCount(), players);
-        initGame(boardComponent, board, data, scoreBoard);
+        initGame(boardComponent, board, data);
     }
 
-    private void initGame(BoardComponent boardComponent, Board board, GameControllerData data, ScoreBoard scoreBoard) {
-        int width = 50, height = 50;
+    private void initGame(BoardComponent boardComponent, Board board, GameControllerData data) {
+        int width = 0, height = 30;
+        boardComponent.setLocation(0, height);
         width += boardComponent.getWidth();
         height += boardComponent.getHeight();
+
+        ScoreBoard scoreBoard=new ScoreBoard(data.getPlayerCount());
+        scoreBoard.setLocation(width - 20, 40);
         width += scoreBoard.getWidth();
         height = Math.max(scoreBoard.getHeight(), height);
-        scoreBoard.setLocation(boardComponent.getWidth() - 20, 40);
+
+        GameInfoComponent infoComponent = new GameInfoComponent();
+        infoComponent.setLocation(0, height);
+        height += infoComponent.getHeight();
+        width = Math.max(width, infoComponent.getWidth());
+
         GameController gameController;
-        gameController = new GameController(boardComponent, board, scoreBoard, data);
+        gameController = new GameController(boardComponent, board, scoreBoard, infoComponent, data);
         GameFrame gameFrame = new GameFrame();
         FrameBackButton gameBack = new FrameBackButton(this, gameFrame);
         gameBack.setSize(80, 20);
-        gameBack.setLocation(boardComponent.getWidth(), 0);
+        gameBack.setLocation(0, 0);
+        width += 50;
+        height += 40;
 
-        JButton save = new JButton("save");
+        JButton save = new JButton("Save");
         save.setSize(80, 20);
-        save.setLocation(boardComponent.getWidth() + 80, 0);
+        save.setLocation(80, 0);
         save.addActionListener(e -> {
             gameController.saveGame();
         });
@@ -166,6 +180,7 @@ public class StartFrame extends JFrame {
         gameFrame.setLocationRelativeTo(null);
         gameFrame.add(boardComponent);
         gameFrame.add(scoreBoard);
+        gameFrame.add(infoComponent);
         gameFrame.add(gameBack);
         gameFrame.add(save);
         gameFrame.setVisible(true);

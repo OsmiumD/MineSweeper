@@ -12,26 +12,21 @@ public class CustomizeDifPanel extends JPanel {
     static Font font;
 
     static {
-        try {
-            font = Font.createFont(Font.TRUETYPE_FONT,
-                    new FileInputStream("src/xyz/view/Font/FrozenNeutra.otf"));
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        font = GameUtil.getFont();
         font = font.deriveFont(Font.PLAIN, 18);
     }
 
     CustomizeDifPanel() {
         setLayout(null);
-        setSize(225 , 400);
+        setSize(225, 400);
 
-        JLabel rowLabel = new JLabel("Row(9-30):");
+        JLabel rowLabel = new JLabel("Row(9-24):");
         rowLabel.setSize(100, 20);
         rowLabel.setFont(font);
         rowLabel.setLocation(50, 50);
         add(rowLabel);
 
-        JLabel colLabel = new JLabel("Column(9-24):");
+        JLabel colLabel = new JLabel("Column(9-30):");
         colLabel.setSize(130, 20);
         colLabel.setFont(font);
         colLabel.setLocation(50, 110);
@@ -60,19 +55,19 @@ public class CustomizeDifPanel extends JPanel {
     }
 
     public boolean isDataAvailable() {
-        if (!isFieldDataAvailable(rowField, 30, 9) ||
-                !isFieldDataAvailable(colField, 24, 9)) {
+        if (!isFieldDataAvailable(rowField, 24, 9) ||
+                !isFieldDataAvailable(colField, 30, 9)) {
             GameUtil.showMessage("Error", "Input not Available");
             return false;
         }
         col = Integer.parseInt(colField.getText());
         row = Integer.parseInt(rowField.getText());
         int grid = row * col;
-        if(!isFieldDataAvailable(mineField,grid/2,1)){
+        if (!isFieldDataAvailable(mineField, grid / 2, 1)) {
             GameUtil.showMessage("Error", "Input not Available");
             return false;
         }
-        mineNum=Integer.parseInt(mineField.getText());
+        mineNum = Integer.parseInt(mineField.getText());
         return true;
     }
 

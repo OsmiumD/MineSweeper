@@ -18,6 +18,7 @@ import java.util.TreeSet;
 public class GameController implements GameListener {
     private final BoardComponent view1;
     private final ScoreBoard view2;
+    private final GameInfoComponent view3;
     private final Board model;
     private byte currentPlayerId;
     private boolean cheatMode;//false:关闭， true:开启
@@ -26,10 +27,14 @@ public class GameController implements GameListener {
     private byte currentStep;//给steps计数
     private final byte playerCount;
     private final boolean sequenceOpen;
+    private byte remainTime;
+    private Thread timer;
+    private final Player[] players;
 
-    public GameController(BoardComponent component, Board board, ScoreBoard scoreBoard, GameControllerData data) {
+    public GameController(BoardComponent component, Board board, ScoreBoard scoreBoard, GameInfoComponent infoComponent, GameControllerData data) {
         this.view1 = component;
         this.view2 = scoreBoard;
+        this.view3 = infoComponent;
         this.model = board;
         this.stepCount = data.getStepCount();
         this.sequenceOpen = data.isSequenceOpen();
@@ -37,12 +42,14 @@ public class GameController implements GameListener {
         this.currentPlayerId = data.getCurrentPlayerId();
         this.currentStep = data.getCurrentStep();
         this.gameState = data.getGameState();
+        this.players = data.getPlayers();
         view1.registerListener(this);
         initialGameState();
     }
 
     public void initialGameState() {
-        cheatMode=false;
+        cheatMode = false;
+        remainTime = 60;
         int num;
         BoardLocation location;
         for (int row = 0; row < model.getRow(); row++) {
@@ -52,17 +59,24 @@ public class GameController implements GameListener {
                 view1.setItemAt(location, num);
             }
         }
-
-        view1.repaint();
+        view3.setStep((byte) (stepCount - currentStep));
+        view3.setPlayer(currentPlayerId);
+        view3.setTime(remainTime);
+        view3.setRemainMine(model.getRemainderMineNum());
+        startTimer();
+        repaintAll();
     }
 
-    public void nextPlayer() {
+    void nextPlayer() {
         currentStep++;
+        remainTime = 60;
         if (currentStep == stepCount) {
             currentStep = 0;
             currentPlayerId = (byte) ((currentPlayerId + 1) % playerCount);//id从0开始
             //currentPlayerId = (currentPlayerId == (byte) 0) ? (byte) 1 : (byte) 0;
         }
+        view3.setPlayer(currentPlayerId);
+        view3.setStep((byte) (stepCount - currentStep));
     }
 
     @Override
@@ -72,35 +86,23 @@ public class GameController implements GameListener {
             model.iniItem();
             gameState = 1;
         }
-        if (!model.isValidClick(location, 1)) {
-            System.out.println("Invalid Click!\n");
+        if (!model.isValidClick(location, 1) || cheatMode) {
+            System.out.println("Invalid Click!");
             return;
         }
         printMessage(location, "left");
-        if (gameState == 0) {
-            gameState = 1;
-        }
-
-        // demo里的，先不删
-        /*
-        Square clickedGrid = model.getGridAt(location);
-        clickedGrid.setOpened(true);
-        view1.setItemAt(location, clickedGrid.getNum());
-        view2.goal(currentPlayer);
-        repaintAll();
-        nextPlayer();
-        */
 
         Square clickedGrid = model.getGridAt(location);
 
         if (clickedGrid.hasLandMine()) {
-            view2.lose(currentPlayerId);
+            lose(currentPlayerId);
         }
         if (sequenceOpen) {
             sequenceOpen(location);
         } else {
             model.openGrid(location);
             view1.setItemAt(location, clickedGrid.getNum());
+            view3.setRemainMine(model.getRemainderMineNum());
         }
         repaintAll();
         if (model.isAllGridClicked()) {
@@ -112,7 +114,7 @@ public class GameController implements GameListener {
 
     @Override
     public void onPlayerRightClick(BoardLocation location, SquareComponent component) {
-        if (gameState == 0 || !model.isValidClick(location, 3)) {
+        if (gameState == 0 || !model.isValidClick(location, 3) || cheatMode) {
             System.out.println("Invalid Click!");
             return;
         }
@@ -124,19 +126,20 @@ public class GameController implements GameListener {
         if (clickedGrid.hasLandMine()) {
             // 有雷，则插旗；加分
             model.flagGrid(location);
-            view2.goal(currentPlayerId);
+            goal(currentPlayerId);
         } else {
             // 没雷，则正常翻开；失误
-            view2.turnover(currentPlayerId);
+            turnover(currentPlayerId);
             // TODO: project描述2.2中要在这里”提示：标记错误“
         }
         view1.setItemAt(location, clickedGrid.getNum());
-        repaintAll();
+        view3.setRemainMine(model.getRemainderMineNum());
         if (model.isAllGridClicked()) {
             gameState = 2;//全部open，游戏结束
         }
         judgeWinner();
         nextPlayer();
+        repaintAll();
     }
 
     @Override
@@ -188,7 +191,9 @@ public class GameController implements GameListener {
 
     private void repaintAll() {
         view1.repaint();
+        view2.update(players);
         view2.repaint();
+        view3.repaint();
     }
 
     /**
@@ -198,14 +203,14 @@ public class GameController implements GameListener {
      */
     private void judgeWinner() {
         boolean winnerIsDetermined = false;
-        SortedSet<Player> playersSortedSet = new TreeSet<>(Arrays.asList(view2.getPlayers()));
+        SortedSet<Player> playersSortedSet = new TreeSet<>(Arrays.asList(players));
 
         //以下：一般判断（所有的格子都open）
         if (gameState == (byte) 2) {
             winnerIsDetermined = true;
             ArrayList<Player> winners = new ArrayList<>();
             Player topPlayer = playersSortedSet.first();
-            for (Player player: playersSortedSet) {
+            for (Player player : playersSortedSet) {
                 if (topPlayer.compareTo(player) == 0) {
                     winners.add(player);
                 } else break;
@@ -225,7 +230,7 @@ public class GameController implements GameListener {
                  *///麻了
                 if (winners.size() == 1) System.out.print("WINNER: ");
                 else System.out.print("WINNERs: ");
-                for (Player player: winners) {
+                for (Player player : winners) {
                     System.out.print(player);
                 }
                 System.out.println();
@@ -258,8 +263,8 @@ public class GameController implements GameListener {
             Player p1 = playersSortedSet.first();
             Player p2 = p1;
             boolean tag = true;
-            for (Player p:
-                 playersSortedSet) {
+            for (Player p :
+                    playersSortedSet) {
                 p2 = p;
                 if (tag) tag = false;
                 else break;
@@ -286,7 +291,7 @@ public class GameController implements GameListener {
         if (grid.isOpened()) return;
         model.openGrid(location);
         view1.setItemAt(location, grid.getNum());
-        view1.repaint();
+        view3.setRemainMine(model.getRemainderMineNum());
         if (grid.getNumberOfLandMine() != 0 || grid.hasLandMine()) return;
         for (int i = -1; i <= 1; i++) {
             for (int j = -1; j <= 1; j++) {
@@ -298,16 +303,53 @@ public class GameController implements GameListener {
 
     public void saveGame() {
         File file = new File(System.getenv("APPDATA") + "\\MineSweeperJavaA\\" + GameUtil.currentTime() + ".msv");
-        ReadSave rs = new ReadSave(model, this, view2);
+        ReadSave rs = new ReadSave(model, this);
         try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(file))) {
             oos.writeObject(rs);
         } catch (Exception e) {
             e.printStackTrace();
         }
-        GameUtil.showMessage("Message","Save Complete!");
+        GameUtil.showMessage("Message", "Save Complete!");
     }
 
     public GameControllerData saveCurrentStatus() {
-        return new GameControllerData(gameState, currentStep, stepCount, currentPlayerId, playerCount, sequenceOpen);
+        return new GameControllerData(gameState, currentStep, stepCount, currentPlayerId, playerCount, sequenceOpen, players);
+    }
+
+    void tick() {
+        remainTime--;
+        if (remainTime <= 0) {
+            nextPlayer();
+        }
+        view3.setTime(remainTime);
+        view3.repaint();
+    }
+
+    private void startTimer() {
+        timer = new Thread(() -> {
+            while (true) {
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                tick();
+            }
+        });
+        timer.start();
+    }
+
+    public void goal(byte playerId) {
+        //scoreBoard[0][playerId]++;
+        players[playerId].goal();
+    }
+
+    public void lose(byte playerId) {
+        //scoreBoard[1][playerId]++;
+        players[playerId].lose();
+    }
+
+    public void turnover(byte playerId) {
+        players[playerId].turnover();
     }
 }

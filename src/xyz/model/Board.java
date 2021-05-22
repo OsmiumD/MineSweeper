@@ -30,7 +30,6 @@ public class Board implements Serializable {
     }
 
     public void iniItem() {
-        // TODO: This is only a demo implementation.
         for (int i = 0; i < row; i++) {
             for (int j = 0; j < column; j++) {
                 grid[i][j].setNumberOfLandMine(calculateNum(i, j));
@@ -79,7 +78,6 @@ public class Board implements Serializable {
     // click type == 2 means that is middle click
     // click type == 3 means that is right click
     public boolean isValidClick(BoardLocation location, int clickType) {
-        // TODO: You should implement a method here to check whether it is a valid action
         switch (clickType) {
             case 1:
             case 3:
@@ -107,8 +105,6 @@ public class Board implements Serializable {
                应在第一次点击后调用此方法
              */
             if (grid[randomRow][randomCol].hasLandMine() ||
-                    grid[randomRow][randomCol].isOpened() ||
-                    grid[randomRow][randomCol].isFlag() ||
                     (location.getRow() == randomRow && location.getColumn() == randomCol)) {
                 i--;
             } else {

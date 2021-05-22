@@ -1,6 +1,8 @@
 package xyz.model;
 
-public class Player implements Comparable<Player>{
+import java.io.Serializable;
+
+public class Player implements Comparable<Player>, Serializable {
     private final byte id;
     private int scoreCnt;//得分（标记正确）与失分（左键触雷）
     private int turnoverCnt;//失误（左键触雷，标记错误）
