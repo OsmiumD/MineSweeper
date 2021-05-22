@@ -158,6 +158,10 @@ public class Board implements Serializable {
         return remainderMineNum;
     }
 
+    public void setRemainderMineNum(int remainderMineNum) {
+        this.remainderMineNum = remainderMineNum;
+    }
+
     public Square[][] getGrid() {
         return grid;
     }

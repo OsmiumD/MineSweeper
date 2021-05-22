@@ -7,8 +7,6 @@ import xyz.view.start.StartFrame;
 import java.io.*;
 
 public class ReadSave implements Serializable {
-    //可能要修改！
-    //那个储存格式根本没用，删了
 
     private final Board board;
     private final int row, col;

@@ -58,9 +58,15 @@ public class Player implements Comparable<Player>, Serializable {
         return scoreCnt;
     }
 
+    public void setScoreCnt(int scoreCnt) {
+        this.scoreCnt = scoreCnt;
+    }
+
     public int getTurnoverCnt() {
         return turnoverCnt;
     }
 
-
+    public void setTurnoverCnt(int turnoverCnt) {
+        this.turnoverCnt = turnoverCnt;
+    }
 }

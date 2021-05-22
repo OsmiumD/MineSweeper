@@ -50,6 +50,7 @@ public class GameController implements GameListener {
     public void initialGameState() {
         cheatMode = false;
         remainTime = 60;
+
         int num;
         BoardLocation location;
         for (int row = 0; row < model.getRow(); row++) {
@@ -59,10 +60,12 @@ public class GameController implements GameListener {
                 view1.setItemAt(location, num);
             }
         }
+
         view3.setStep((byte) (stepCount - currentStep));
         view3.setPlayer(currentPlayerId);
         view3.setTime(remainTime);
         view3.setRemainMine(model.getRemainderMineNum());
+
         startTimer();
         repaintAll();
     }
@@ -73,7 +76,6 @@ public class GameController implements GameListener {
         if (currentStep == stepCount) {
             currentStep = 0;
             currentPlayerId = (byte) ((currentPlayerId + 1) % playerCount);//id从0开始
-            //currentPlayerId = (currentPlayerId == (byte) 0) ? (byte) 1 : (byte) 0;
         }
         view3.setPlayer(currentPlayerId);
         view3.setStep((byte) (stepCount - currentStep));
@@ -218,16 +220,6 @@ public class GameController implements GameListener {
             if (winners.size() == playerCount) {
                 System.out.println("Tie Game! No Winner!");
             } else {
-                /*
-                StringBuilder winnerMessage = new StringBuilder();
-                winnerMessage.append("WINNER(s): ");
-                for (Player player: winners) {
-                    winnerMessage.append(player).append(", ");
-                }
-                winnerMessage.delete(winnerMessage.capacity()-2, winnerMessage.capacity());
-                winnerMessage.append("\n");
-                System.out.println(winnerMessage);
-                 *///麻了
                 if (winners.size() == 1) System.out.print("WINNER: ");
                 else System.out.print("WINNERs: ");
                 for (Player player : winners) {
@@ -236,27 +228,6 @@ public class GameController implements GameListener {
                 System.out.println();
             }
         }
-        /*
-        if (gameState == 2) {
-            if (view2.getScoreBoard()[0][0] > view2.getScoreBoard()[0][1]) {
-                winnerIsDetermined = true;
-                //winner: player_0
-            } else if (view2.getScoreBoard()[0][0] < view2.getScoreBoard()[0][1]) {
-                winnerIsDetermined = true;
-                //winner: player_1
-            } else if (view2.getScoreBoard()[1][0] < view2.getScoreBoard()[1][1]) {
-                winnerIsDetermined = true;
-                //winner: player_0
-            } else if (view2.getScoreBoard()[1][0] > view2.getScoreBoard()[1][1]) {
-                winnerIsDetermined = true;
-                //winner: player_1
-            } else {
-                winnerIsDetermined = true;
-                System.out.println("Tie Game! No Winner!");
-                //平局
-            }
-        }
-         */
 
         //以下：提前结束
         else {
@@ -316,6 +287,47 @@ public class GameController implements GameListener {
         return new GameControllerData(gameState, currentStep, stepCount, currentPlayerId, playerCount, sequenceOpen, players);
     }
 
+    public void resetGame() {
+        cheatMode = false;
+        gameState = (byte) 1;
+        currentPlayerId = (byte) 0;
+        currentStep = (byte) 0;
+        remainTime = 60;
+        for (Player player: players) {
+            player.setScoreCnt(0);
+            player.setTurnoverCnt(0);
+        }
+
+        //Board model的参数
+        for (int i = 0; i < model.getRow(); i++) {
+            for (int j = 0; j < model.getColumn(); j++) {
+                model.getGrid()[i][j].setOpened(false);
+                model.getGrid()[i][j].setFlag(false);
+            }
+        }
+        model.setRemainderMineNum(model.getMineNum());
+
+        //BoardComponent view1的参数
+        BoardLocation location;
+        for (int i = 0; i < model.getRow(); i++) {
+            for (int j = 0; j < model.getColumn(); j++) {
+                location = new BoardLocation(i, j);
+                view1.setItemAt(location, 10);//10:closed
+            }
+        }
+
+        //ScoreBoard view2在repaintAll()中reset，即.update(players)
+
+        //GameInfoComponent view3的参数
+        view3.setStep((byte) (stepCount - currentStep));
+        view3.setPlayer(currentPlayerId);
+        view3.setTime(remainTime);
+        view3.setRemainMine(model.getRemainderMineNum());
+
+        startTimer();
+        repaintAll();
+    }
+
     void tick() {
         remainTime--;
         if (remainTime <= 0) {
@@ -340,12 +352,10 @@ public class GameController implements GameListener {
     }
 
     public void goal(byte playerId) {
-        //scoreBoard[0][playerId]++;
         players[playerId].goal();
     }
 
     public void lose(byte playerId) {
-        //scoreBoard[1][playerId]++;
         players[playerId].lose();
     }
 
