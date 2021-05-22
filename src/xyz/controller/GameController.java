@@ -142,6 +142,7 @@ public class GameController implements GameListener {
         judgeWinner();
         nextPlayer();
         repaintAll();
+        machinePlayerMove();
     }
 
     @Override
@@ -182,6 +183,7 @@ public class GameController implements GameListener {
             }
         }
         repaintAll();
+        machinePlayerMove();
     }
 
     private void printMessage(BoardLocation location, String str) {
@@ -349,6 +351,20 @@ public class GameController implements GameListener {
             }
         });
         timer.start();
+    }
+
+    private void machinePlayerMove() {
+        if (players[currentPlayerId].getClass() == MachinePlayer.class) {
+            MachinePlayer player = (MachinePlayer) players[currentPlayerId];
+            player.move(model);
+            BoardLocation clickedLocation = player.getClickLocation();
+            SquareComponent clickedComponent = view1.getGridAt(clickedLocation);
+            if (player.getClickType() == 1) {
+                onPlayerLeftClick(clickedLocation, clickedComponent);
+            }else {
+                onPlayerRightClick(clickedLocation, clickedComponent);
+            }
+        }
     }
 
     public void goal(byte playerId) {

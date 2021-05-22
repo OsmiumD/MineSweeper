@@ -3,9 +3,9 @@ package xyz.model;
 import java.io.Serializable;
 
 public class Player implements Comparable<Player>, Serializable {
-    private final byte id;
-    private int scoreCnt;//得分（标记正确）与失分（左键触雷）
-    private int turnoverCnt;//失误（左键触雷，标记错误）
+    protected final byte id;
+    protected int scoreCnt;//得分（标记正确）与失分（左键触雷）
+    protected int turnoverCnt;//失误（左键触雷，标记错误）
 
     public Player(byte id) {
         this.id = id;
