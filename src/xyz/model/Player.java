@@ -31,7 +31,7 @@ public class Player implements Comparable<Player>, Serializable {
 
     @Override
     public String toString() {
-        return String.format("Player_%d", id);
+        return String.format("Player_%d", (id+1));
     }
 
     public void goal() {

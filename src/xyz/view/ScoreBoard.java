@@ -10,13 +10,8 @@ import java.io.FileInputStream;
 
 public class ScoreBoard extends JComponent {
     private final int[][] scoreBoard;//[0:得分; 1:失分][players]
-    private static Font font;
+    private static final Font font= GameUtil.getFont().deriveFont(Font.PLAIN, 20);
     private final byte playerCount;
-
-    static {
-        font = GameUtil.getFont();
-        font = font.deriveFont(Font.PLAIN, 20);
-    }
 
     public ScoreBoard(byte playerCount) {
         setSize(220, 40 * 2 * playerCount + 40);
@@ -27,9 +22,9 @@ public class ScoreBoard extends JComponent {
     }
 
     @Override
-    public void paint(Graphics g) {
+    public void paintComponent(Graphics g) {
         //窗口内容
-        super.paint(g);
+        super.paintComponent(g);
         int y = 40;
         for (int i = 0; i < playerCount; i++) {
             g.drawString("Player" + (i + 1) + "-score:", 40, y);

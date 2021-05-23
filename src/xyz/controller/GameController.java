@@ -6,6 +6,7 @@ import xyz.GameUtil;
 import xyz.listener.GameListener;
 import xyz.model.*;
 import xyz.view.*;
+import xyz.view.music.MusicPlayer;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -28,6 +29,7 @@ public class GameController implements GameListener {
     private final byte playerCount;
     private final boolean sequenceOpen;
     private byte remainTime;
+    private final byte COUNTDOWN_TIME = (byte) 60;
     private Thread timer;
     private final Player[] players;
 
@@ -49,17 +51,9 @@ public class GameController implements GameListener {
 
     public void initialGameState() {
         cheatMode = false;
-        remainTime = 60;
+        remainTime = COUNTDOWN_TIME;
 
-        int num;
-        BoardLocation location;
-        for (int row = 0; row < model.getRow(); row++) {
-            for (int col = 0; col < model.getColumn(); col++) {
-                location = new BoardLocation(row, col);
-                num = model.getNumAt(location);
-                view1.setItemAt(location, num);
-            }
-        }
+        renewTexture();
 
         view3.setStep((byte) (stepCount - currentStep));
         view3.setPlayer(currentPlayerId);
@@ -72,13 +66,14 @@ public class GameController implements GameListener {
 
     void nextPlayer() {
         currentStep++;
-        remainTime = 60;
+        remainTime = COUNTDOWN_TIME;
         if (currentStep == stepCount) {
             currentStep = 0;
             currentPlayerId = (byte) ((currentPlayerId + 1) % playerCount);//id从0开始
         }
         view3.setPlayer(currentPlayerId);
         view3.setStep((byte) (stepCount - currentStep));
+        view3.repaint();
     }
 
     @Override
@@ -88,7 +83,7 @@ public class GameController implements GameListener {
             model.iniItem();
             gameState = 1;
         }
-        if (!model.isValidClick(location, 1) || cheatMode) {
+        if (!model.isValidClick(location, 1) || cheatMode || gameState == 2) {
             System.out.println("Invalid Click!");
             return;
         }
@@ -98,6 +93,8 @@ public class GameController implements GameListener {
 
         if (clickedGrid.hasLandMine()) {
             lose(currentPlayerId);
+            MusicPlayer boom = new MusicPlayer("src\\xyz\\view\\music\\boom.mp3");
+            boom.play();
         }
         if (sequenceOpen) {
             sequenceOpen(location);
@@ -107,7 +104,7 @@ public class GameController implements GameListener {
             view3.setRemainMine(model.getRemainderMineNum());
         }
         repaintAll();
-        if (model.isAllGridClicked()) {
+        if (model.getRemainderMineNum() == 0) {
             gameState = 2;//全部open，游戏结束
         }
         judgeWinner();
@@ -116,7 +113,7 @@ public class GameController implements GameListener {
 
     @Override
     public void onPlayerRightClick(BoardLocation location, SquareComponent component) {
-        if (gameState == 0 || !model.isValidClick(location, 3) || cheatMode) {
+        if (gameState == 0 || !model.isValidClick(location, 3) || cheatMode || gameState == 2) {
             System.out.println("Invalid Click!");
             return;
         }
@@ -136,7 +133,7 @@ public class GameController implements GameListener {
         }
         view1.setItemAt(location, clickedGrid.getNum());
         view3.setRemainMine(model.getRemainderMineNum());
-        if (model.isAllGridClicked()) {
+        if (model.getRemainderMineNum() == 0) {
             gameState = 2;//全部open，游戏结束
         }
         judgeWinner();
@@ -244,15 +241,17 @@ public class GameController implements GameListener {
             }
             if (p1.getScoreCnt() - p2.getScoreCnt() > model.getRemainderMineNum()) {
                 winnerIsDetermined = true;
-                System.out.printf("WINNER: %s\n", p1.toString());
+                System.out.printf("WINNER: %s\n", p1);
+                gameState = 2;
             }
         }
 
         System.out.printf("judge winner, gameState is %d\n", gameState);
         if (winnerIsDetermined) {
             System.out.println("Game Ended.");
-            //TODO:取消（所有？至少返回按键不要）（返回键的Listener不是这样子的，可以取消）Listener注册；显示输赢
-            //view1.unregisterListener(this);
+            RankFrame rankFrame = new RankFrame(players);
+            rankFrame.setVisible(true);
+            rankFrame.repaint();
         } else {
             System.out.println("Game Continue.");
         }
@@ -290,12 +289,14 @@ public class GameController implements GameListener {
     }
 
     public void resetGame() {
+        if (gameState == 0) return;
         cheatMode = false;
         gameState = (byte) 1;
         currentPlayerId = (byte) 0;
         currentStep = (byte) 0;
         remainTime = 60;
-        for (Player player: players) {
+        timer.interrupt();
+        for (Player player : players) {
             player.setScoreCnt(0);
             player.setTurnoverCnt(0);
         }
@@ -345,7 +346,7 @@ public class GameController implements GameListener {
                 try {
                     Thread.sleep(1000);
                 } catch (InterruptedException e) {
-                    e.printStackTrace();
+                    System.out.println("Timer interrupted");
                 }
                 tick();
             }
@@ -361,7 +362,7 @@ public class GameController implements GameListener {
             SquareComponent clickedComponent = view1.getGridAt(clickedLocation);
             if (player.getClickType() == 1) {
                 onPlayerLeftClick(clickedLocation, clickedComponent);
-            }else {
+            } else {
                 onPlayerRightClick(clickedLocation, clickedComponent);
             }
         }
@@ -377,5 +378,16 @@ public class GameController implements GameListener {
 
     public void turnover(byte playerId) {
         players[playerId].turnover();
+    }
+
+    public void renewTexture() {
+        BoardLocation location;
+        for (int row = 0; row < model.getRow(); row++) {
+            for (int col = 0; col < model.getColumn(); col++) {
+                location = new BoardLocation(row, col);
+                view1.setItemAt(location, model.getNumAt(location));
+            }
+        }
+        view1.repaint();
     }
 }

@@ -6,10 +6,8 @@ import xyz.controller.GameControllerData;
 import xyz.controller.ReadSave;
 import xyz.model.Board;
 import xyz.model.Player;
-import xyz.view.BoardComponent;
-import xyz.view.GameFrame;
-import xyz.view.GameInfoComponent;
-import xyz.view.ScoreBoard;
+import xyz.view.*;
+import xyz.view.music.MusicPlayer;
 
 import javax.swing.*;
 import java.io.*;
@@ -131,9 +129,9 @@ public class StartFrame extends JFrame {
     private void initGame(int row, int col, int mineNum) {
         BoardComponent boardComponent = initBoardComponent(row, col);
         Board board = initBoard(row, col, mineNum);
-        Player[] players=new Player[playerSettingPanel.getPlayerCount()];
+        Player[] players = new Player[playerSettingPanel.getPlayerCount()];
         for (byte i = 0; i < playerSettingPanel.getPlayerCount(); i++) {
-            players[i]=new Player(i);
+            players[i] = new Player(i);
         }
         GameControllerData data = new GameControllerData((byte) 0, (byte) 0, playerSettingPanel.getStep(), (byte) 0, playerSettingPanel.getPlayerCount(), playerSettingPanel.isSequenceOpen(), players);
         initGame(boardComponent, board, data);
@@ -150,7 +148,7 @@ public class StartFrame extends JFrame {
         width += boardComponent.getWidth();
         height += boardComponent.getHeight();
 
-        ScoreBoard scoreBoard=new ScoreBoard(data.getPlayerCount());
+        ScoreBoard scoreBoard = new ScoreBoard(data.getPlayerCount());
         scoreBoard.setLocation(width - 20, 40);
         width += scoreBoard.getWidth();
         height = Math.max(scoreBoard.getHeight(), height);
@@ -162,18 +160,57 @@ public class StartFrame extends JFrame {
 
         GameController gameController;
         gameController = new GameController(boardComponent, board, scoreBoard, infoComponent, data);
+
         GameFrame gameFrame = new GameFrame();
+
+        width += 50;
+        height += 40;
+
         FrameBackButton gameBack = new FrameBackButton(this, gameFrame);
         gameBack.setSize(80, 20);
         gameBack.setLocation(0, 0);
-        width += 50;
-        height += 40;
 
         JButton save = new JButton("Save");
         save.setSize(80, 20);
         save.setLocation(80, 0);
         save.addActionListener(e -> {
             gameController.saveGame();
+        });
+
+        JButton reset = new JButton("Reset");
+        reset.setSize(80, 20);
+        reset.setLocation(160, 0);
+        reset.addActionListener(e -> {
+            gameController.resetGame();
+        });
+
+        MusicPlayer BGM = new MusicPlayer("src\\xyz\\view\\music\\BGM.mp3");
+        BGM.setLoop(true);
+        JToggleButton music = new JToggleButton("Music");
+        music.setSize(80, 20);
+        music.setLocation(240, 0);
+        music.addActionListener(e -> {
+            if (music.isSelected()) {
+                BGM.play();
+            } else {
+                BGM.stop();
+            }
+        });
+        gameBack.addStop(BGM);
+
+        BGComponent bg = new BGComponent();
+        gameFrame.addBG(bg);
+        JButton texture = new JButton();
+        if (GameUtil.getTexture() == 0) texture.setText("STD");
+        if (GameUtil.getTexture() == 1) texture.setText("MC");
+        texture.setSize(80, 20);
+        texture.setLocation(320, 0);
+        texture.addActionListener(e -> {
+            GameUtil.changeTexture();
+            bg.repaint();
+            if (GameUtil.getTexture() == 0) texture.setText("STD");
+            if (GameUtil.getTexture() == 1) texture.setText("MC");
+            gameController.renewTexture();
         });
 
         gameFrame.setSize(width, height);
@@ -183,6 +220,9 @@ public class StartFrame extends JFrame {
         gameFrame.add(infoComponent);
         gameFrame.add(gameBack);
         gameFrame.add(save);
+        gameFrame.add(reset);
+        gameFrame.add(music);
+        gameFrame.add(texture);
         gameFrame.setVisible(true);
         setVisible(false);
     }

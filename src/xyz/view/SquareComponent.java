@@ -4,11 +4,10 @@ import xyz.GameUtil;
 
 import javax.swing.*;
 import java.awt.*;
-import java.io.FileInputStream;
 
 public class SquareComponent extends JPanel {
     //一个方块
-    private int size;
+    private final int size;
     private static Font font;
     private int num;
 
