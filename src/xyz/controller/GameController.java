@@ -423,6 +423,7 @@ public class GameController implements GameListener {
 
         currentStep = stepToBe;
         currentPlayerId = playerIdToBe;
+        view1.setItemAt(lastClickedLocation, lastClickedGrid.getNum());
         view3.setStep((byte) (stepCount - stepToBe));
         view3.setPlayer(playerIdToBe);
         view3.setTime(COUNTDOWN_TIME);
