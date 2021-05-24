@@ -11,10 +11,7 @@ import xyz.view.music.MusicPlayer;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.ObjectOutputStream;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.SortedSet;
-import java.util.TreeSet;
+import java.util.*;
 
 public class GameController implements GameListener {
     private final BoardComponent view1;
@@ -46,6 +43,7 @@ public class GameController implements GameListener {
         this.gameState = data.getGameState();
         this.players = data.getPlayers();
         view1.registerListener(this);
+        view1.registerGridListener(this);
         initialGameState();
     }
 
@@ -88,11 +86,12 @@ public class GameController implements GameListener {
             return;
         }
         printMessage(location, "left");
+        players[currentPlayerId].getClickedLocations().add(location);
 
         Square clickedGrid = model.getGridAt(location);
 
         if (clickedGrid.hasLandMine()) {
-            lose(currentPlayerId);
+            lose(currentPlayerId, location);
             MusicPlayer boom = new MusicPlayer("src\\xyz\\view\\music\\boom.mp3");
             boom.play();
             new Thread(new AnimationRunnable(GameUtil.getBoom(), view1.getGridAt(location))).start();
@@ -122,16 +121,17 @@ public class GameController implements GameListener {
         }
         printMessage(location, "right");
 
+        players[currentPlayerId].getClickedLocations().add(location);
         Square clickedGrid = model.getGridAt(location);
         model.openGrid(location);
 
         if (clickedGrid.hasLandMine()) {
             // 有雷，则插旗；加分
             model.flagGrid(location);
-            goal(currentPlayerId);
+            goal(currentPlayerId, location);
         } else {
             // 没雷，则正常翻开；失误
-            turnover(currentPlayerId);
+            turnover(currentPlayerId, location);
             // TODO: project描述2.2中要在这里”提示：标记错误“
         }
         view1.setItemAt(location, clickedGrid.getNum());
@@ -184,6 +184,21 @@ public class GameController implements GameListener {
         }
         repaintAll();
         machinePlayerMove();
+    }
+
+    @Override
+    public void mouseEnter(BoardLocation location, SquareComponent component) {
+        Square enteredGrid = model.getGridAt(location);
+        System.out.println("Mouse enter");
+        view1.setItemAt(location, 12);
+        repaintAll();
+    }
+
+    @Override
+    public void mouseExit(BoardLocation location, SquareComponent component) {
+        Square enteredGrid = model.getGridAt(location);
+        view1.setItemAt(location, model.getNumAt(location));
+        repaintAll();
     }
 
     private void printMessage(BoardLocation location, String str) {
@@ -297,11 +312,10 @@ public class GameController implements GameListener {
         gameState = (byte) 1;
         currentPlayerId = (byte) 0;
         currentStep = (byte) 0;
-        remainTime = 60;
+        remainTime = COUNTDOWN_TIME;
         timer.interrupt();
         for (Player player : players) {
-            player.setScoreCnt(0);
-            player.setTurnoverCnt(0);
+            player.remake();
         }
 
         //Board model的参数
@@ -370,17 +384,60 @@ public class GameController implements GameListener {
             }
         }
     }
+    public boolean undo() {
+        timer.interrupt();
 
-    public void goal(byte playerId) {
-        players[playerId].goal();
+        byte playerIdToBe;
+        byte stepToBe;
+        if (currentStep != 0) {
+            playerIdToBe = currentPlayerId;
+            stepToBe = (byte) (currentStep - 1);
+        } else {
+            playerIdToBe = (byte) (currentPlayerId - 1);
+            stepToBe = (byte) (stepCount - 1);
+            if (playerIdToBe < 0) playerIdToBe += playerCount;
+        }
+        Player playerTobe = players[playerIdToBe];
+        List<BoardLocation> clickedLocations = players[playerIdToBe].getClickedLocations();
+        if (clickedLocations.size() == 0) return false;
+        BoardLocation lastClickedLocation = clickedLocations.get(clickedLocations.size() - 1);
+        Square lastClickedGrid = model.getGridAt(lastClickedLocation);
+
+        lastClickedGrid.setOpened(false);
+        if (lastClickedGrid.hasLandMine()) {
+            model.setRemainderMineNum(model.getRemainderMineNum() + 1);
+            if (lastClickedGrid.isFlag()) {
+                playerTobe.unGoal();
+                lastClickedGrid.setFlag(false);
+            } else {
+                playerTobe.unLose();
+            }
+        } else {
+            if (playerTobe.getTurnoverOrNot().get(lastClickedLocation)) {
+                playerTobe.unTurnover();
+            }
+        }
+
+        view3.setStep(stepToBe);
+        view3.setPlayer(playerIdToBe);
+        view3.setTime(COUNTDOWN_TIME);
+        view3.setRemainMine(model.getRemainderMineNum());
+
+        startTimer();
+        repaintAll();
+        return true;
     }
 
-    public void lose(byte playerId) {
-        players[playerId].lose();
+    public void goal(byte playerId, BoardLocation location) {
+        players[playerId].goal(location);
     }
 
-    public void turnover(byte playerId) {
-        players[playerId].turnover();
+    public void lose(byte playerId, BoardLocation location) {
+        players[playerId].lose(location);
+    }
+
+    public void turnover(byte playerId, BoardLocation location) {
+        players[playerId].turnover(location);
     }
 
     public void renewTexture() {

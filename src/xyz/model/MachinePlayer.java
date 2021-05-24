@@ -1,7 +1,5 @@
 package xyz.model;
 
-import java.util.Random;
-
 public class MachinePlayer extends Player{
     private int clickType;
     private BoardLocation clickLocation;

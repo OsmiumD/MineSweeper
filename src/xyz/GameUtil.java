@@ -64,6 +64,8 @@ public class GameUtil {
         switch (i) {
             case 11:
                 return flag;
+            case 12:
+                return flag;
             case 10:
                 return mask;
             case 9:

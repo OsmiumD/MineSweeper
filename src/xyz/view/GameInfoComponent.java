@@ -1,6 +1,7 @@
 package xyz.view;
 
 import xyz.GameUtil;
+import xyz.model.Player;
 
 import javax.swing.*;
 import java.awt.*;
@@ -33,6 +34,13 @@ public class GameInfoComponent extends JComponent {
     }
 
     public void setRemainMine(int remainMine) {
+        this.remainMine = remainMine;
+    }
+
+    public void update(byte step, byte player, byte time, int remainMine) {
+        this.step = step;
+        this.player = player;
+        this.time = time;
         this.remainMine = remainMine;
     }
 

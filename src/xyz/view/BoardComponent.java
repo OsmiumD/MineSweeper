@@ -32,7 +32,7 @@ public class BoardComponent extends JComponent {
     private void initialGridComponent() {
         for (int i = 0; i < row; i++) {
             for (int j = 0; j < col; j++) {
-                gridComponents[i][j] = new SquareComponent(gridSize);
+                gridComponents[i][j] = new SquareComponent(gridSize, i, j);
                 gridComponents[i][j].setLocation(i * gridSize, j * gridSize);
                 add(gridComponents[i][j]);
             }
@@ -94,4 +94,19 @@ public class BoardComponent extends JComponent {
         listenerList.remove(listener);
     }
 
+    public void registerGridListener(GameListener listener) {
+        for (SquareComponent[] grids: gridComponents) {
+            for (SquareComponent grid: grids) {
+                grid.registerListener(listener);
+            }
+        }
+    }
+
+    public void unregisterGridListener(GameListener listener) {
+        for (SquareComponent[] grids: gridComponents) {
+            for (SquareComponent grid: grids) {
+                grid.unregisterListener(listener);
+            }
+        }
+    }
 }
