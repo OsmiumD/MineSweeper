@@ -9,7 +9,7 @@ public class Player implements Comparable<Player>, Serializable {
     protected final byte id;
     protected int scoreCnt;//得分（标记正确）与失分（左键触雷）
     protected int turnoverCnt;//失误（左键触雷，标记错误）
-    private int avatar;
+    private byte avatar;
     protected List<BoardLocation> clickedLocations;
     protected HashMap<BoardLocation, Boolean> turnoverOrNot;
 
@@ -110,11 +110,11 @@ public class Player implements Comparable<Player>, Serializable {
         this.turnoverCnt = turnoverCnt;
     }
 
-    public int getAvatar() {
+    public byte getAvatar() {
         return avatar;
     }
 
-    public void setAvatar(int avatar) {
+    public void setAvatar(byte avatar) {
         this.avatar = avatar;
     }
 

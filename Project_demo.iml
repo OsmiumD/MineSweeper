@@ -19,16 +19,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$USER_HOME$/Tools/jmp123_400_utf8_mini/jmp123.jar!/" />
-        </CLASSES>
-        <JAVADOC />
-        <SOURCES />
-      </library>
-    </orderEntry>
-    <orderEntry type="module-library">
-      <library>
-        <CLASSES>
-          <root url="jar://$USER_HOME$/Downloads/jmp123.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../Tools/jmp123_400_utf8_mini/jmp123.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />

@@ -4,12 +4,14 @@ import xyz.GameUtil;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionListener;
 
 public class PlayerSettingPanel extends JPanel {
     JComboBox<Byte> playerCount;
     JComboBox<Byte> stepCount;
     JCheckBox sequenceOpen;
     static Font font;
+    ActionListener playerListener;
 
     static {
         font = GameUtil.getFont();
@@ -54,6 +56,10 @@ public class PlayerSettingPanel extends JPanel {
         sequenceOpen.setSize(130, 20);
         sequenceOpen.setLocation(35, 130);
         add(sequenceOpen);
+
+        playerCount.addActionListener(e -> {
+            playerListener.actionPerformed(e);
+        });
     }
 
     public byte getPlayerCount() {
@@ -66,5 +72,9 @@ public class PlayerSettingPanel extends JPanel {
 
     public boolean isSequenceOpen() {
         return sequenceOpen.isSelected();
+    }
+
+    public void addPlayerListener(ActionListener listener) {
+        this.playerListener = listener;
     }
 }

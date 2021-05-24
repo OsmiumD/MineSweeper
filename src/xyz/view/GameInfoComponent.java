@@ -8,7 +8,7 @@ import java.awt.*;
 
 public class GameInfoComponent extends JComponent {
     static Font font;
-    private byte player, step, time;
+    private byte player, step, time, avatar;
     private int remainMine;
 
     static {
@@ -44,6 +44,10 @@ public class GameInfoComponent extends JComponent {
         this.remainMine = remainMine;
     }
 
+    public void setAvatar(byte avatar) {
+        this.avatar = avatar;
+    }
+
     @Override
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
@@ -65,7 +69,7 @@ public class GameInfoComponent extends JComponent {
         g.drawString("RemainingMine:", 170, 60);
         g.drawString("" + remainMine, 300, 60);
 
-        g.drawImage(GameUtil.getAvatar(1), 330, 0, 140, 70, this);
+        g.drawImage(GameUtil.getAvatar(avatar), 330, 0, 140, 70, this);
 
         g.drawLine(0, 1, 330, 1);
         g.drawLine(0, 70, 330, 70);
