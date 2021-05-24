@@ -43,47 +43,8 @@ public class BoardComponent extends JComponent {
         return gridComponents[location.getRow()][location.getColumn()];
     }
 
-    private BoardLocation getLocationByPosition(int x, int y) {
-        return new BoardLocation(x / gridSize, y / gridSize);
-    }
-
     public void setItemAt(BoardLocation location, int num) {
         getGridAt(location).setItem(num);
-    }
-
-    // 通过鼠标事件更改：界面 （其他在GameController中改）
-    @Override
-    protected void processMouseEvent(MouseEvent e) {
-        super.processMouseEvent(e);
-        if (e.getID() != MouseEvent.MOUSE_PRESSED) return;
-        switch (e.getButton()) {
-            case MouseEvent.BUTTON1: {
-                JComponent clickedComponent = (JComponent) getComponentAt(e.getX(), e.getY());
-                //get被点击的component
-                BoardLocation location = getLocationByPosition(e.getX(), e.getY());
-                for (GameListener listener : listenerList) {
-                    listener.onPlayerLeftClick(location, (SquareComponent) clickedComponent);
-                    //告诉GameController各个各个各个Listener：被点击的位置、component
-                }
-                break;
-            }
-            case MouseEvent.BUTTON2: {
-                JComponent clickedComponent = (JComponent) getComponentAt(e.getX(), e.getY());
-                BoardLocation location = getLocationByPosition(e.getX(), e.getY());
-                for (GameListener listener : listenerList) {
-                    listener.onPlayerMidClick(location, (SquareComponent) clickedComponent);
-                }
-                break;
-            }
-            case MouseEvent.BUTTON3: {
-                JComponent clickedComponent = (JComponent) getComponentAt(e.getX(), e.getY());
-                BoardLocation location = getLocationByPosition(e.getX(), e.getY());
-                for (GameListener listener : listenerList) {
-                    listener.onPlayerRightClick(location, (SquareComponent) clickedComponent);
-                }
-                break;
-            }
-        }
     }
 
     public void registerListener(GameListener listener) {

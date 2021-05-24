@@ -44,6 +44,10 @@ public class GameController implements GameListener {
         this.players = data.getPlayers();
         view1.registerListener(this);
         view1.registerGridListener(this);
+        for (Player player : players) {
+            if (player instanceof MachinePlayer)
+                ((MachinePlayer) player).addListener(this);
+        }
         initialGameState();
     }
 
@@ -68,6 +72,7 @@ public class GameController implements GameListener {
         if (currentStep == stepCount) {
             currentStep = 0;
             currentPlayerId = (byte) ((currentPlayerId + 1) % playerCount);//id从0开始
+            view3.setAvatar(players[currentPlayerId].getAvatar());
         }
         view3.setPlayer(currentPlayerId);
         view3.setStep((byte) (stepCount - currentStep));
@@ -92,11 +97,11 @@ public class GameController implements GameListener {
 
         if (clickedGrid.hasLandMine()) {
             lose(currentPlayerId, location);
-            MusicPlayer boom = new MusicPlayer("src\\xyz\\view\\music\\boom.mp3");
+            MusicPlayer boom = new MusicPlayer(GameUtil.getRoot() + "view\\music\\boom.mp3");
             boom.play();
             new Thread(new AnimationRunnable(GameUtil.getBoom(), view1.getGridAt(location))).start();
-        }else{
-            new MusicPlayer("src\\xyz\\view\\music\\open.mp3").play();
+        } else {
+            new MusicPlayer(GameUtil.getRoot() + "view\\music\\open.mp3").play();
         }
         if (sequenceOpen) {
             sequenceOpen(location);
@@ -111,6 +116,8 @@ public class GameController implements GameListener {
         }
         judgeWinner();
         nextPlayer();
+        machinePlayerMove();
+        System.out.println();
     }
 
     @Override
@@ -143,6 +150,7 @@ public class GameController implements GameListener {
         nextPlayer();
         repaintAll();
         machinePlayerMove();
+        System.out.println();
     }
 
     @Override
@@ -183,21 +191,23 @@ public class GameController implements GameListener {
             }
         }
         repaintAll();
-        machinePlayerMove();
     }
 
     @Override
     public void mouseEnter(BoardLocation location, SquareComponent component) {
         Square enteredGrid = model.getGridAt(location);
-        System.out.println("Mouse enter");
-        view1.setItemAt(location, 12);
+        if (!(enteredGrid.isOpened() || cheatMode)) {
+            view1.setItemAt(location, 12);
+        }
         repaintAll();
     }
 
     @Override
     public void mouseExit(BoardLocation location, SquareComponent component) {
         Square enteredGrid = model.getGridAt(location);
-        view1.setItemAt(location, model.getNumAt(location));
+        if (!(enteredGrid.isOpened() || cheatMode)) {
+            view1.setItemAt(location, enteredGrid.getNum());
+        }
         repaintAll();
     }
 
@@ -313,7 +323,6 @@ public class GameController implements GameListener {
         currentPlayerId = (byte) 0;
         currentStep = (byte) 0;
         remainTime = COUNTDOWN_TIME;
-        timer.interrupt();
         for (Player player : players) {
             player.remake();
         }
@@ -343,8 +352,8 @@ public class GameController implements GameListener {
         view3.setPlayer(currentPlayerId);
         view3.setTime(remainTime);
         view3.setRemainMine(model.getRemainderMineNum());
+        view3.setAvatar(players[currentPlayerId].getAvatar());
 
-        startTimer();
         repaintAll();
     }
 
@@ -372,21 +381,14 @@ public class GameController implements GameListener {
     }
 
     private void machinePlayerMove() {
-        if (players[currentPlayerId].getClass() == MachinePlayer.class) {
+        if (players[currentPlayerId] instanceof MachinePlayer) {
             MachinePlayer player = (MachinePlayer) players[currentPlayerId];
-            player.move(model);
-            BoardLocation clickedLocation = player.getClickLocation();
-            SquareComponent clickedComponent = view1.getGridAt(clickedLocation);
-            if (player.getClickType() == 1) {
-                onPlayerLeftClick(clickedLocation, clickedComponent);
-            } else {
-                onPlayerRightClick(clickedLocation, clickedComponent);
-            }
+            repaintAll();
+            player.move(model, view1);
         }
     }
-    public boolean undo() {
-        timer.interrupt();
 
+    public boolean undo() {
         byte playerIdToBe;
         byte stepToBe;
         if (currentStep != 0) {
@@ -399,7 +401,9 @@ public class GameController implements GameListener {
         }
         Player playerTobe = players[playerIdToBe];
         List<BoardLocation> clickedLocations = players[playerIdToBe].getClickedLocations();
-        if (clickedLocations.size() == 0) return false;
+        if (clickedLocations.size() == 0) {
+            return false;
+        }
         BoardLocation lastClickedLocation = clickedLocations.get(clickedLocations.size() - 1);
         Square lastClickedGrid = model.getGridAt(lastClickedLocation);
 
@@ -423,7 +427,6 @@ public class GameController implements GameListener {
         view3.setTime(COUNTDOWN_TIME);
         view3.setRemainMine(model.getRemainderMineNum());
 
-        startTimer();
         repaintAll();
         return true;
     }

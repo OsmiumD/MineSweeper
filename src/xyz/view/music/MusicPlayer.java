@@ -4,8 +4,6 @@ import jmp123.demo.MiniPlayer;
 import jmp123.output.Audio;
 import xyz.listener.Stoppable;
 
-import java.io.File;
-
 public class MusicPlayer implements Stoppable {
 
     private final MiniPlayer player;

@@ -36,16 +36,39 @@ public class SquareComponent extends JPanel {
     protected void processMouseEvent(MouseEvent e) {
         super.processMouseEvent(e);
         if (e.getID() == MouseEvent.MOUSE_ENTERED) {
-            for (GameListener listener: listenerList) {
+            for (GameListener listener : listenerList) {
                 listener.mouseEnter(location, this);
             }
-            System.out.println("Mouse Entered");
         }
         if (e.getID() == MouseEvent.MOUSE_EXITED) {
-            for (GameListener listener: listenerList) {
+            for (GameListener listener : listenerList) {
                 listener.mouseExit(location, this);
             }
-            System.out.println("Mouse Exited");
+        }
+        if (e.getID() == MouseEvent.MOUSE_PRESSED) {
+            switch (e.getButton()) {
+                case MouseEvent.BUTTON1: {
+                    //get被点击的component
+                    for (GameListener listener : listenerList) {
+                        listener.onPlayerLeftClick(location, this);
+                        //告诉GameController各个各个各个Listener：被点击的位置、component
+                    }
+                    break;
+                }
+                case MouseEvent.BUTTON2: {
+                    for (GameListener listener : listenerList) {
+                        listener.onPlayerMidClick(location, this);
+                    }
+                    break;
+                }
+                case MouseEvent.BUTTON3: {
+                    JComponent clickedComponent = (JComponent) getComponentAt(e.getX(), e.getY());
+                    for (GameListener listener : listenerList) {
+                        listener.onPlayerRightClick(location, this);
+                    }
+                    break;
+                }
+            }
         }
     }
 
