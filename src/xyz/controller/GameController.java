@@ -91,7 +91,6 @@ public class GameController implements GameListener {
             return;
         }
         printMessage(location, "left");
-        players[currentPlayerId].getClickedLocations().add(location);
 
         Square clickedGrid = model.getGridAt(location);
 
@@ -101,6 +100,7 @@ public class GameController implements GameListener {
             boom.play();
             new Thread(new AnimationRunnable(GameUtil.getBoom(), view1.getGridAt(location))).start();
         } else {
+            normal(currentPlayerId, location);
             new MusicPlayer(GameUtil.getRoot() + "view\\music\\open.mp3").play();
         }
         if (sequenceOpen) {
@@ -395,9 +395,8 @@ public class GameController implements GameListener {
             playerIdToBe = currentPlayerId;
             stepToBe = (byte) (currentStep - 1);
         } else {
-            playerIdToBe = (byte) (currentPlayerId - 1);
+            playerIdToBe = (currentPlayerId == 0) ? (byte) (playerCount - 1) : (byte) (currentPlayerId - 1);
             stepToBe = (byte) (stepCount - 1);
-            if (playerIdToBe < 0) playerIdToBe += playerCount;
         }
         Player playerTobe = players[playerIdToBe];
         List<BoardLocation> clickedLocations = players[playerIdToBe].getClickedLocations();
@@ -419,10 +418,12 @@ public class GameController implements GameListener {
         } else {
             if (playerTobe.getTurnoverOrNot().get(lastClickedLocation)) {
                 playerTobe.unTurnover();
-            }
+            }else playerTobe.unNormal();
         }
 
-        view3.setStep(stepToBe);
+        currentStep = stepToBe;
+        currentPlayerId = playerIdToBe;
+        view3.setStep((byte) (stepCount - stepToBe));
         view3.setPlayer(playerIdToBe);
         view3.setTime(COUNTDOWN_TIME);
         view3.setRemainMine(model.getRemainderMineNum());
@@ -441,6 +442,10 @@ public class GameController implements GameListener {
 
     public void turnover(byte playerId, BoardLocation location) {
         players[playerId].turnover(location);
+    }
+
+    public void normal(byte playerId, BoardLocation location) {
+        players[playerId].normal(location);
     }
 
     public void renewTexture() {

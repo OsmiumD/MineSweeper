@@ -82,6 +82,14 @@ public class Player implements Comparable<Player>, Serializable {
         turnoverOrNot.remove(clickedLocations.get(clickedLocations.size() - 1));
         clickedLocations.remove(clickedLocations.size() - 1);
     }
+    public void normal(BoardLocation location) {
+        turnoverOrNot.put(location, false);
+        clickedLocations.add(location);
+    }
+    public void unNormal() {
+        turnoverOrNot.remove(clickedLocations.get(clickedLocations.size() - 1));
+        clickedLocations.remove(clickedLocations.size() - 1);
+    }
 
     public void remake() {
         scoreCnt = 0;
