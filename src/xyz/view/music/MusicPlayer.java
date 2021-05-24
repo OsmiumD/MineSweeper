@@ -19,9 +19,15 @@ public class MusicPlayer implements Stoppable {
             e.printStackTrace();
         }
         Thread playerThread = new Thread(() -> {
-            do {
+            while(true) {
                 player.run();
-            } while (loop);
+                if(!loop)break;
+                try {
+                    player.open(path);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
         });
         playerThread.start();
         player.pause();

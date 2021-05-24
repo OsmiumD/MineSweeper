@@ -95,6 +95,9 @@ public class GameController implements GameListener {
             lose(currentPlayerId);
             MusicPlayer boom = new MusicPlayer("src\\xyz\\view\\music\\boom.mp3");
             boom.play();
+            new Thread(new AnimationRunnable(GameUtil.getBoom(), view1.getGridAt(location))).start();
+        }else{
+            new MusicPlayer("src\\xyz\\view\\music\\open.mp3").play();
         }
         if (sequenceOpen) {
             sequenceOpen(location);

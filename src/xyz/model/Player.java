@@ -6,6 +6,7 @@ public class Player implements Comparable<Player>, Serializable {
     protected final byte id;
     protected int scoreCnt;//得分（标记正确）与失分（左键触雷）
     protected int turnoverCnt;//失误（左键触雷，标记错误）
+    private int avatar;
 
     public Player(byte id) {
         this.id = id;
@@ -31,7 +32,7 @@ public class Player implements Comparable<Player>, Serializable {
 
     @Override
     public String toString() {
-        return String.format("Player_%d", (id+1));
+        return String.format("Player_%d", (id + 1));
     }
 
     public void goal() {
@@ -68,5 +69,13 @@ public class Player implements Comparable<Player>, Serializable {
 
     public void setTurnoverCnt(int turnoverCnt) {
         this.turnoverCnt = turnoverCnt;
+    }
+
+    public int getAvatar() {
+        return avatar;
+    }
+
+    public void setAvatar(int avatar) {
+        this.avatar = avatar;
     }
 }

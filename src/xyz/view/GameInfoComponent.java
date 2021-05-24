@@ -16,7 +16,7 @@ public class GameInfoComponent extends JComponent {
     }
 
     public GameInfoComponent() {
-        setSize(550, 80);
+        setSize(500, 80);
         setLayout(null);
     }
 
@@ -43,6 +43,7 @@ public class GameInfoComponent extends JComponent {
     }
 
     private void painting(Graphics g) {
+
         g.setFont(font);
         g.drawString("CurrentPlayer:", 0, 20);
         g.drawString("" + (player + 1), 140, 20);
@@ -50,13 +51,18 @@ public class GameInfoComponent extends JComponent {
         g.drawString("RemainingSteps:", 170, 20);
         g.drawString("" + step, 310, 20);
 
-        g.drawString("TimeRemaining:", 350, 20);
-        g.drawString(String.format("%02d", time), 490, 20);
+        g.drawString("TimeRemaining:", 0, 60);
+        g.drawString(String.format("%02d", time), 140, 60);
 
-        g.drawString("RemainingMine:",170,60);
-        g.drawString(""+remainMine,300,60);
+        g.drawString("RemainingMine:", 170, 60);
+        g.drawString("" + remainMine, 300, 60);
 
-        g.drawLine(0, 0, 100, 0);
-        g.drawLine(0,80,100,80);
+        g.drawImage(GameUtil.getAvatar(1), 330, 0, 140, 70, this);
+
+        g.drawLine(0, 1, 330, 1);
+        g.drawLine(0, 70, 330, 70);
+        g.drawLine(0, 35, 330, 35);
+        g.drawLine(165, 0, 165, 70);
+        g.drawLine(330, 0, 330, 70);
     }
 }
