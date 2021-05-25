@@ -29,6 +29,11 @@ public class GameController implements GameListener {
     private final byte COUNTDOWN_TIME = (byte) 60;
     private Thread timer;
     private final Player[] players;
+    private int player1 = 3;
+    private int player2 = 3;
+    private int player3 = 3;
+    private int player4 = 2;
+    private boolean isMachinePlayerMoving = false;
 
     public GameController(BoardComponent component, Board board, ScoreBoard scoreBoard, GameInfoComponent infoComponent, GameControllerData data) {
         this.view1 = component;
@@ -73,6 +78,11 @@ public class GameController implements GameListener {
             currentStep = 0;
             currentPlayerId = (byte) ((currentPlayerId + 1) % playerCount);//id从0开始
             view3.setAvatar(players[currentPlayerId].getAvatar());
+            if(players[currentPlayerId] instanceof MachinePlayer){
+                view1.disableGridClick();
+            }else{
+                view1.enableGridClick();
+            }
         }
         view3.setPlayer(currentPlayerId);
         view3.setStep((byte) (stepCount - currentStep));
@@ -157,37 +167,56 @@ public class GameController implements GameListener {
     // 开作弊模式，显示所有（实际做的是：未open的）格子的数字
     // 关作弊模式，取消未open格子的数字
     public void onPlayerMidClick(BoardLocation location, SquareComponent component) {
-        if (gameState == 0 || !model.isValidClick(location, 2)) {
-            System.out.println("Invalid Click!");
-            return;
-        }
-        //printMessage(location, "middle");
-        if (!cheatMode) {
-            cheatMode = true;
-            System.out.println("Cheating Mode: On.");
-            for (int i = 0; i < model.getRow(); i++) {
-                for (int j = 0; j < model.getColumn(); j++) {
-                    if (!model.getGrid()[i][j].isOpened()) {
-                        view1.setItemAt(model.getGrid()[i][j].getLocation(), model.getGrid()[i][j].getNumberOfLandMine());
+        if (gameState == 0 || gameState == 2 || isMachinePlayerMoving) return;
+        Square clickedGrid = model.getGridAt(location);
+        if (currentPlayerId == 0) {
+            System.out.println(player1);
+            if (player1 > 0) {
+                if (!cheatMode) {
+                    cheatMode = true;
+                    for (int i = 0; i < model.getRow(); i++) {
+                        if (!model.getGrid()[i][location.getColumn()].isOpened()) {
+                            view1.setItemAt(model.getGrid()[i][location.getColumn()].getLocation(), model.getGrid()[i][location.getColumn()].getNumberOfLandMine());
+                        }
+                        if (model.getGrid()[i][location.getColumn()].hasLandMine()) {
+                            view1.setItemAt(model.getGrid()[i][location.getColumn()].getLocation(), 9);
+                        }
                     }
-                    if (model.getGrid()[i][j].hasLandMine()) {
-                        view1.setItemAt(model.getGrid()[i][j].getLocation(), 9);
-                    }
+                } else {
+                    disableCheatMode();
+                    player1--;
                 }
             }
-        } else {
-            cheatMode = false;
-            System.out.println("Cheating Mode: Off.");
-            for (int i = 0; i < model.getRow(); i++) {
-                for (int j = 0; j < model.getColumn(); j++) {
-                    if (!model.getGrid()[i][j].isOpened()) {
-                        view1.setItemAt(model.getGrid()[i][j].getLocation(), model.getGrid()[i][j].getNum());
-                        // 这句话的意思参照了initialGameState()
+        }
+        if (currentPlayerId == 1) {
+            if (player2 > 0) {
+                if (!cheatMode) {
+                    cheatMode = true;
+                    for (int i = 0; i < model.getColumn(); i++) {
+                        if (!model.getGrid()[location.getRow()][i].isOpened()) {
+                            view1.setItemAt(model.getGrid()[location.getRow()][i].getLocation(), model.getGrid()[location.getRow()][i].getNumberOfLandMine());
+                        }
+                        if (model.getGrid()[location.getRow()][i].hasLandMine()) {
+                            view1.setItemAt(model.getGrid()[location.getRow()][i].getLocation(), 9);
+                        }
                     }
-                    if (model.getGrid()[i][j].isFlag()) {
-                        view1.setItemAt(model.getGrid()[i][j].getLocation(), 11);
-                    }
+                } else {
+                    disableCheatMode();
+                    player2--;
                 }
+            }
+        }
+        if (currentPlayerId == 2) {
+            if (player3 > 0) {
+                currentStep -= 3;
+                view3.setStep((byte) (stepCount - currentStep));
+                player3--;
+            }
+        }
+        if (currentPlayerId == 3) {
+            if (player4 > 0) {
+                goal(currentPlayerId, null);
+                player4--;
             }
         }
         repaintAll();
@@ -334,6 +363,10 @@ public class GameController implements GameListener {
 
     public void resetGame() {
         if (gameState == 0) return;
+        player1 = 3;
+        player2 = 3;
+        player3 = 3;
+        player4 = 2;
         cheatMode = false;
         gameState = (byte) 1;
         currentPlayerId = (byte) 0;
@@ -399,14 +432,13 @@ public class GameController implements GameListener {
     private void machinePlayerMove() {
         if (players[currentPlayerId] instanceof MachinePlayer) {
             MachinePlayer player = (MachinePlayer) players[currentPlayerId];
-            repaintAll();
             player.move(model, view1);
+            repaintAll();
         }
     }
 
     public boolean undo() {
         if (gameState == (byte) 2) return false;
-
         byte playerIdToBe;
         byte stepToBe;
         if (currentStep != 0) {
@@ -442,7 +474,7 @@ public class GameController implements GameListener {
              */
             if (playerTobe.getTurnoverOrNot().get(lastClickedLocation)) {
                 playerTobe.unTurnover();
-            }else playerTobe.unNormal();
+            } else playerTobe.unNormal();
         }
 
         currentStep = stepToBe;
@@ -484,5 +516,41 @@ public class GameController implements GameListener {
             }
         }
         view1.repaint();
+    }
+
+    public void enableCheatMode() {
+        if (gameState == 0) {
+            return;
+        }
+        cheatMode = true;
+        System.out.println("Cheating Mode: On.");
+        for (int i = 0; i < model.getRow(); i++) {
+            for (int j = 0; j < model.getColumn(); j++) {
+                if (!model.getGrid()[i][j].isOpened()) {
+                    view1.setItemAt(model.getGrid()[i][j].getLocation(), model.getGrid()[i][j].getNumberOfLandMine());
+                }
+                if (model.getGrid()[i][j].hasLandMine()) {
+                    view1.setItemAt(model.getGrid()[i][j].getLocation(), 9);
+                }
+            }
+        }
+        repaintAll();
+    }
+
+    public void disableCheatMode() {
+        cheatMode = false;
+        System.out.println("Cheating Mode: Off.");
+        for (int i = 0; i < model.getRow(); i++) {
+            for (int j = 0; j < model.getColumn(); j++) {
+                if (!model.getGrid()[i][j].isOpened()) {
+                    view1.setItemAt(model.getGrid()[i][j].getLocation(), model.getGrid()[i][j].getNum());
+                    // 这句话的意思参照了initialGameState()
+                }
+                if (model.getGrid()[i][j].isFlag()) {
+                    view1.setItemAt(model.getGrid()[i][j].getLocation(), 11);
+                }
+            }
+        }
+        repaintAll();
     }
 }

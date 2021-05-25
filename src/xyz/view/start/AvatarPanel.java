@@ -26,13 +26,15 @@ public class AvatarPanel extends JPanel {
             map.put(machines[i], buttons[i]);
             AvatarButton avatar = buttons[i];
             avatar.addActionListener(e -> {
-                AvatarSelectFrame avatarSelectFrame = new AvatarSelectFrame();
-                avatarSelectFrame.setVisible(true);
-                avatarSelectFrame.addActionListener(e1 -> {
-                    avatar.setAvatar(Byte.parseByte(((JButton) e1.getSource()).getText()));
-                    System.out.println(avatar.getAvatar());
-                    avatar.renewIcon();
-                });
+                if(avatar.getAvatar()!=(byte) 4){
+                    AvatarSelectFrame avatarSelectFrame = new AvatarSelectFrame();
+                    avatarSelectFrame.setVisible(true);
+                    avatarSelectFrame.addActionListener(e1 -> {
+                        avatar.setAvatar(Byte.parseByte(((JButton) e1.getSource()).getText()));
+                        System.out.println(avatar.getAvatar());
+                        avatar.renewIcon();
+                    });
+                }
             });
         }
         setSize(200, 400);

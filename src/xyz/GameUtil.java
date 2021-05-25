@@ -2,10 +2,12 @@ package xyz;
 
 import javax.swing.*;
 import java.awt.*;
-import java.io.FileInputStream;
+import java.io.InputStream;
+import java.net.URL;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Objects;
 
 public class GameUtil {
     private static Image mask;
@@ -17,47 +19,49 @@ public class GameUtil {
     private static Font font;
     private static ArrayList<Image> boom;
     private static final ArrayList<Image> avatar = new ArrayList<>();
-    private static final String root = "src\\xyz\\";
-    private static final String picRoot = root + "view\\pic\\";
+    private static final String root = "xyz/";
+    private static final String picRoot = root + "view/pic/";
     private static final Toolkit toolkit = Toolkit.getDefaultToolkit();
+    private static final ClassLoader cl = Thread.currentThread().getContextClassLoader();
 
     private static int texture;
 
     static {
+
         try {
             font = Font.createFont(Font.TRUETYPE_FONT,
-                    new FileInputStream(root + "view\\Font\\FrozenNeutra.otf"));
+                    getResource(root + "view/Font/FrozenNeutra.otf"));
         } catch (Exception e) {
             e.printStackTrace();
         }
         texture = 1;
         changeTexture();
         for (int i = 0; i < 5; i++) {
-            avatar.add(toolkit.getImage(picRoot + "avatar\\" + i + ".png"));
+            avatar.add(getImage(picRoot + "avatar/" + i + ".png"));
         }
     }
 
     public static void changeTexture() {
         boom = new ArrayList<>();
-        String dict = "standard\\";
+        String dict = "standard/";
         int animationSize = 13;
         texture = texture == 0 ? 1 : 0;
         if (texture == 0) {
-            dict = "standard\\";
+            dict = "standard/";
         }
         if (texture == 1) {
-            dict = "mc\\";
+            dict = "mc/";
             animationSize = 0;
         }
-        mask = toolkit.getImage(picRoot + dict + "mask.png");
-        empty = toolkit.getImage(picRoot + dict + "empty.png");
-        mine = toolkit.getImage(picRoot + dict + "mine.png");
-        flag = toolkit.getImage(picRoot + dict + "flag.png");
-        selected = toolkit.getImage(picRoot + dict + "selected.png");
-        bg = toolkit.getImage(picRoot + dict + "bg.png");
+        mask = getImage(picRoot + dict + "mask.png");
+        empty = getImage(picRoot + dict + "empty.png");
+        mine = getImage(picRoot + dict + "mine.png");
+        flag = getImage(picRoot + dict + "flag.png");
+        selected = getImage(picRoot + dict + "selected.png");
+        bg = getImage(picRoot + dict + "bg.png");
 
         for (int i = 1; i <= animationSize; i++) {
-            boom.add(toolkit.getImage(picRoot + dict + "boom\\" + i + ".png"));
+            boom.add(getImage(picRoot + dict + "boom/" + i + ".png"));
         }
     }
 
@@ -118,6 +122,16 @@ public class GameUtil {
 
     public static String getRoot() {
         return root;
+    }
+
+    public static InputStream getResource(String path) {
+        return Objects.requireNonNull(cl.getResourceAsStream(path));
+    }
+
+    public static Image getImage(String path) {
+        URL url = cl.getResource(path);
+        if(url==null)return null;
+        return toolkit.getImage(url);
     }
 }
 

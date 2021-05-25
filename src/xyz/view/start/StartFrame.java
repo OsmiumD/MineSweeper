@@ -12,13 +12,11 @@ import xyz.view.music.MusicPlayer;
 
 import javax.swing.*;
 import java.io.*;
-import java.util.ArrayList;
 
 public class StartFrame extends JFrame {
 
     private final PlayerSettingPanel playerSettingPanel;
     private final AvatarPanel avatarPanel;
-    private boolean PVE = false;
 
     public StartFrame() {
         setTitle("Select");
@@ -27,13 +25,9 @@ public class StartFrame extends JFrame {
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         setLayout(null);
 
-        JButton offline = new JButton("offline");
+        JButton offline = new JButton("Play");
         offline.setSize(80, 20);
         offline.setLocation(60, 50);
-
-        JButton PVE = new JButton("PVE");
-        PVE.setSize(80, 20);
-        PVE.setLocation(60, 100);
 
         JButton customize = new JButton("customize");
         customize.setSize(120, 20);
@@ -52,7 +46,6 @@ public class StartFrame extends JFrame {
         startPanel.setSize(200, 400);
         startPanel.add(offline);
         startPanel.add(loadGame);
-        startPanel.add(PVE);
         add(startPanel);
 
         JPanel difSelectPanel = new JPanel();
@@ -61,7 +54,7 @@ public class StartFrame extends JFrame {
         difSelectPanel.setSize(200, 400);
         difSelectPanel.add(difBack);
         difSelectPanel.add(customize);
-        ArrayList<JButton> difButtons = initDifButton(difSelectPanel);
+        initDifButton(difSelectPanel);
         difSelectPanel.setVisible(false);
         add(difSelectPanel);
 
@@ -79,12 +72,6 @@ public class StartFrame extends JFrame {
         add(avatarPanel);
 
         offline.addActionListener(e -> {
-            startPanel.setVisible(false);
-            difSelectPanel.setVisible(true);
-        });
-
-        PVE.addActionListener(e -> {
-            this.PVE = true;
             startPanel.setVisible(false);
             difSelectPanel.setVisible(true);
         });
@@ -202,16 +189,12 @@ public class StartFrame extends JFrame {
         JButton save = new JButton("Save");
         save.setSize(80, 20);
         save.setLocation(80, 0);
-        save.addActionListener(e -> {
-            gameController.saveGame();
-        });
+        save.addActionListener(e -> gameController.saveGame());
 
         JButton reset = new JButton("Reset");
         reset.setSize(80, 20);
         reset.setLocation(160, 0);
-        reset.addActionListener(e -> {
-            gameController.resetGame();
-        });
+        reset.addActionListener(e -> gameController.resetGame());
 
         MusicPlayer BGM = new MusicPlayer(GameUtil.getRoot() + "view\\music\\BGM.mp3");
         BGM.setLoop(true);
@@ -230,9 +213,7 @@ public class StartFrame extends JFrame {
         JButton undo = new JButton("Undo");
         undo.setSize(80, 20);
         undo.setLocation(480, 0);
-        undo.addActionListener(e -> {
-            gameController.undo();
-        });
+        undo.addActionListener(e -> gameController.undo());
 
         JToggleButton cheat = new JToggleButton("Cheat");
         cheat.setSize(80, 20);
@@ -256,6 +237,14 @@ public class StartFrame extends JFrame {
             gameController.renewTexture();
         });
 
+        cheat.addActionListener(e -> {
+            if(cheat.isSelected()){
+                gameController.enableCheatMode();
+            }else{
+                gameController.disableCheatMode();
+            }
+        });
+
         gameFrame.setSize(width, height);
         gameFrame.setLocationRelativeTo(null);
         gameFrame.add(boardComponent);
@@ -272,8 +261,7 @@ public class StartFrame extends JFrame {
         setVisible(false);
     }
 
-    private ArrayList<JButton> initDifButton(JComponent component) {
-        ArrayList<JButton> difButtons = new ArrayList<>();
+    private void initDifButton(JComponent component) {
         int y = 40;
         for (Difficulty dif : Difficulty.values()) {
             JButton button = new JButton(dif.toString());
@@ -282,8 +270,6 @@ public class StartFrame extends JFrame {
             button.addActionListener(e -> initGame(dif));
             y += 60;
             component.add(button);
-            difButtons.add(button);
         }
-        return difButtons;
     }
 }

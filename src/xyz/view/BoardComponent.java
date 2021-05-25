@@ -70,4 +70,20 @@ public class BoardComponent extends JComponent {
             }
         }
     }
+
+    public void enableGridClick(){
+        for (SquareComponent[] grids: gridComponents) {
+            for (SquareComponent grid: grids) {
+                grid.enableClick();
+            }
+        }
+    }
+
+    public void disableGridClick(){
+        for (SquareComponent[] grids: gridComponents) {
+            for (SquareComponent grid: grids) {
+                grid.disableClick();
+            }
+        }
+    }
 }

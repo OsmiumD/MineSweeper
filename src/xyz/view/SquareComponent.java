@@ -103,4 +103,11 @@ public class SquareComponent extends JPanel {
         listenerList.remove(listener);
     }
 
+    public void disableClick(){
+        disableEvents(MouseEvent.MOUSE_EVENT_MASK);
+    }
+
+    public void enableClick(){
+        enableEvents(MouseEvent.MOUSE_EVENT_MASK);
+    }
 }

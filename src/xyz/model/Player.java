@@ -21,22 +21,12 @@ public class Player implements Comparable<Player>, Serializable {
         turnoverOrNot = new HashMap<>();
     }
 
-    public Player(byte id, int scoreCnt, int turnoverCnt) {
-        this.id = id;
-        this.scoreCnt = scoreCnt;
-        this.turnoverCnt = scoreCnt;
-        clickedLocations = new ArrayList<>();
-        turnoverOrNot = new HashMap<>();
-    }
-
     @Override
     public int compareTo(Player that) {
         //表现最好的player排最前（-1）
         if (this.scoreCnt > that.getScoreCnt()) return -1;
         if (this.scoreCnt < that.getScoreCnt()) return 1;
-        if (this.turnoverCnt < that.getTurnoverCnt()) return -1;
-        if (this.turnoverCnt > that.getTurnoverCnt()) return 1;
-        return 0;
+        return Integer.compare(this.turnoverCnt, that.getTurnoverCnt());
     }
 
     @Override
@@ -48,7 +38,7 @@ public class Player implements Comparable<Player>, Serializable {
         scoreCnt++;
         turnoverOrNot.put(location, false);
         clickedLocations.add(location);
-        System.out.printf("%s scored 1 point! Congrats!\n", toString());
+        System.out.printf("%s scored 1 point! Congrats!\n", this);
     }
     public void unGoal() {
         scoreCnt--;
@@ -61,8 +51,8 @@ public class Player implements Comparable<Player>, Serializable {
         turnoverCnt++;
         turnoverOrNot.put(location, true);
         clickedLocations.add(location);
-        System.out.printf("%s made a turnover!\n", toString());
-        System.out.printf("%s lost 1 point!\n", toString());
+        System.out.printf("%s made a turnover!\n", this);
+        System.out.printf("%s lost 1 point!\n", this);
     }
     public void unLose() {
         scoreCnt++;
@@ -75,7 +65,7 @@ public class Player implements Comparable<Player>, Serializable {
         turnoverCnt++;
         turnoverOrNot.put(location, true);
         clickedLocations.add(location);
-        System.out.printf("%s made a turnover!\n", toString());
+        System.out.printf("%s made a turnover!\n", this);
     }
     public void unTurnover() {
         turnoverCnt--;
