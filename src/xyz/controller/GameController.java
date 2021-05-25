@@ -301,6 +301,22 @@ public class GameController implements GameListener {
         }
     }
 
+    public void sequenceClose(BoardLocation location) {
+        if (!model.isLocationInBound(location)) return;
+        Square grid = model.getGridAt(location);
+        if (!grid.isOpened()) return;
+        model.closeGrid(location);
+        view1.setItemAt(location, grid.getNum());
+        view3.setRemainMine(model.getRemainderMineNum());
+        if (grid.getNumberOfLandMine() != 0 || grid.hasLandMine()) return;
+        for (int i = -1; i <= 1; i++) {
+            for (int j = -1; j <= 1; j++) {
+                if (i == 0 && j == 0) continue;
+                sequenceClose(new BoardLocation(location.getRow() + i, location.getColumn() + j));
+            }
+        }
+    }
+
     public void saveGame() {
         File file = new File(System.getenv("APPDATA") + "\\MineSweeperJavaA\\" + GameUtil.currentTime() + ".msv");
         ReadSave rs = new ReadSave(model, this);
@@ -389,6 +405,8 @@ public class GameController implements GameListener {
     }
 
     public boolean undo() {
+        if (gameState == (byte) 2) return false;
+
         byte playerIdToBe;
         byte stepToBe;
         if (currentStep != 0) {
@@ -406,16 +424,22 @@ public class GameController implements GameListener {
         BoardLocation lastClickedLocation = clickedLocations.get(clickedLocations.size() - 1);
         Square lastClickedGrid = model.getGridAt(lastClickedLocation);
 
-        lastClickedGrid.setOpened(false);
+        model.closeGrid(lastClickedLocation);
+
         if (lastClickedGrid.hasLandMine()) {
-            model.setRemainderMineNum(model.getRemainderMineNum() + 1);
             if (lastClickedGrid.isFlag()) {
                 playerTobe.unGoal();
-                lastClickedGrid.setFlag(false);
             } else {
                 playerTobe.unLose();
             }
         } else {
+            /*
+            if (sequenceOpen) {
+                sequenceClose(lastClickedLocation);
+            } else {
+                model.closeGrid(lastClickedLocation);
+            }
+             */
             if (playerTobe.getTurnoverOrNot().get(lastClickedLocation)) {
                 playerTobe.unTurnover();
             }else playerTobe.unNormal();
@@ -423,9 +447,11 @@ public class GameController implements GameListener {
 
         currentStep = stepToBe;
         currentPlayerId = playerIdToBe;
+        remainTime = COUNTDOWN_TIME;
         view1.setItemAt(lastClickedLocation, lastClickedGrid.getNum());
         view3.setStep((byte) (stepCount - stepToBe));
         view3.setPlayer(playerIdToBe);
+        view3.setAvatar(playerTobe.getAvatar());
         view3.setTime(COUNTDOWN_TIME);
         view3.setRemainMine(model.getRemainderMineNum());
 

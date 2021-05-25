@@ -70,6 +70,13 @@ public class Board implements Serializable {
         }
     }
 
+    public void closeGrid(BoardLocation location) {
+        getGridAt(location).setOpened(false);
+        if (getGridAt(location).hasLandMine()) {
+            remainderMineNum++;
+        }
+    }
+
     public void flagGrid(BoardLocation location) {
         getGridAt(location).setFlag(true);
     }

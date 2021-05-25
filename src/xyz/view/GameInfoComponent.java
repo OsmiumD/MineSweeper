@@ -37,13 +37,6 @@ public class GameInfoComponent extends JComponent {
         this.remainMine = remainMine;
     }
 
-    public void update(byte step, byte player, byte time, int remainMine) {
-        this.step = step;
-        this.player = player;
-        this.time = time;
-        this.remainMine = remainMine;
-    }
-
     public void setAvatar(byte avatar) {
         this.avatar = avatar;
     }
