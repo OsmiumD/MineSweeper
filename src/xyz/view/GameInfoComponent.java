@@ -1,7 +1,6 @@
 package xyz.view;
 
 import xyz.GameUtil;
-import xyz.model.Player;
 
 import javax.swing.*;
 import java.awt.*;

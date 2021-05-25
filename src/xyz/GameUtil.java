@@ -92,9 +92,11 @@ public class GameUtil {
     public static void showMessage(String title, String content) {
         JFrame frame = new JFrame();
         JLabel label = new JLabel(content);
-        frame.setSize(100, 40);
+        label.setSize(200,20);
+        label.setLocation(80,20);
+        frame.setSize(100, 80);
         frame.setTitle(title);
-        frame.setLayout(new FlowLayout());
+        frame.setLayout(null);
         frame.add(label);
         frame.setLocationRelativeTo(null);
         frame.setVisible(true);
